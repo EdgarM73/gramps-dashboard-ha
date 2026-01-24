@@ -1,0 +1,8 @@
+{
+  "name": "Gramps Dashboard",
+  "content_in_root": false,
+  "filename": "gramps-dashboard.js",
+  "country": ["DE"],
+  "render_readme": true,
+  "homeassistant": "2024.1.0"
+}
