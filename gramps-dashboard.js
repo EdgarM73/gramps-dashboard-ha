@@ -348,7 +348,7 @@ class GrampsDashboardCard extends HTMLElement {
           name_entity: 'sensor.next_birthday_1_name',
           age_entity: 'sensor.next_birthday_1_age',
           birthdate_entity: 'sensor.next_birthday_1_date',
-          picture_entity: 'sensor.next_birthday_1_picture'
+          picture_entity: 'sensor.next_birthday_1_image'
         }
       ],
       theme: 'default',

@@ -100,15 +100,15 @@ entities:
   - name_entity: sensor.next_birthday_1_name
     age_entity: sensor.next_birthday_1_age
     birthdate_entity: sensor.next_birthday_1_date
-    picture_entity: sensor.next_birthday_1_picture
+    picture_entity: sensor.next_birthday_1_image
   - name_entity: sensor.next_birthday_2_name
     age_entity: sensor.next_birthday_2_age
     birthdate_entity: sensor.next_birthday_2_date
-    picture_entity: sensor.next_birthday_2_picture
+    picture_entity: sensor.next_birthday_2_image
   - name_entity: sensor.next_birthday_3_name
     age_entity: sensor.next_birthday_3_age
     birthdate_entity: sensor.next_birthday_3_date
-    picture_entity: sensor.next_birthday_3_picture
+    picture_entity: sensor.next_birthday_3_image
 ```
 
 ### Mit Home Assistant Personen
