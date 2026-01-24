@@ -9,6 +9,7 @@ const TRANSLATIONS = {
     show_header: 'Header anzeigen',
     persons: 'Personen',
     add_person: 'Person hinzufügen',
+    add_all: 'Alle hinzufügen',
     select_person: '-- Wähle eine Person --',
     remove: 'Entfernen',
     person: 'Person',
@@ -27,6 +28,7 @@ const TRANSLATIONS = {
     show_header: 'Show header',
     persons: 'Persons',
     add_person: 'Add person',
+    add_all: 'Add All',
     select_person: '-- Select a person --',
     remove: 'Remove',
     person: 'Person',
@@ -45,6 +47,7 @@ const TRANSLATIONS = {
     show_header: 'Afficher l\'en-tête',
     persons: 'Personnes',
     add_person: 'Ajouter une personne',
+    add_all: 'Ajouter tous',
     select_person: '-- Sélectionner une personne --',
     remove: 'Supprimer',
     person: 'Personne',
@@ -531,13 +534,14 @@ class GrampsDashboardEditor extends HTMLElement {
           `;
           }).join('')}
         </div>
-        <div class="actions" style="margin-top:8px;">
+        <div class="actions" style="margin-top:8px; display: flex; gap: 8px;">
           <label style="flex: 1;">
             ${this.localize('add_person')}
             <select id="person-selector" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2);">
               <option value="">${this.localize('select_person')}</option>
             </select>
           </label>
+          <button id="add-all-btn" style="padding: 8px 16px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; background: var(--primary-color, #03A9F4); color: white; font-weight: 600; height: 42px; margin-top: 24px;">${this.localize('add_all')}</button>
         </div>
       </fieldset>
     `;
@@ -576,6 +580,14 @@ class GrampsDashboardEditor extends HTMLElement {
           this._addPersonByNumber(e.target.value);
           e.target.value = ''; // Reset selector
         }
+      });
+    }
+
+    // Add all button
+    const addAllBtn = this.shadowRoot.getElementById('add-all-btn');
+    if (addAllBtn) {
+      addAllBtn.addEventListener('click', () => {
+        this._addAllPersons();
       });
     }
 
@@ -641,6 +653,48 @@ class GrampsDashboardEditor extends HTMLElement {
     this._updateEntityList();
     this._populatePersonSelector();
     this._fireConfigChanged();
+  }
+
+  _addAllPersons() {
+    if (!this._hass) return;
+
+    // Find all next_birthday_*_name sensors
+    const nameSensors = Object.keys(this._hass.states)
+      .filter(entityId => entityId.match(/^sensor\.next_birthday_(\d+)_name$/))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)[0]);
+        const numB = parseInt(b.match(/\d+/)[0]);
+        return numA - numB;
+      });
+
+    let addedCount = 0;
+    nameSensors.forEach(entityId => {
+      const match = entityId.match(/^sensor\.next_birthday_(\d+)_name$/);
+      if (match) {
+        const number = match[1];
+        
+        // Check if already added
+        const alreadyAdded = this._config.entities.some(e => 
+          e.name_entity === entityId
+        );
+
+        if (!alreadyAdded) {
+          this._config.entities.push({
+            name_entity: `sensor.next_birthday_${number}_name`,
+            age_entity: `sensor.next_birthday_${number}_age`,
+            birthdate_entity: `sensor.next_birthday_${number}_date`,
+            picture_entity: `sensor.next_birthday_${number}_image`
+          });
+          addedCount++;
+        }
+      }
+    });
+
+    if (addedCount > 0) {
+      this._updateEntityList();
+      this._populatePersonSelector();
+      this._fireConfigChanged();
+    }
   }
 
   _updateEntityList() {
