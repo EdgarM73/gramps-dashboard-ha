@@ -541,6 +541,10 @@ class GrampsDashboardEditor extends HTMLElement {
         if (id === 'name_entity') el.includeDomains = ['input_text','sensor'];
         if (id === 'age_entity') el.includeDomains = ['sensor','input_number'];
         if (id === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
+        // Filter für Gramps Birthday Sensoren
+        if (['image_entity','name_entity','age_entity','birthdate_entity'].includes(id)) {
+          el.entityFilter = (entityId) => entityId?.startsWith('sensor.next_birthday_');
+        }
         el.addEventListener('value-changed', (ev) => this._updateValue(id, ev.detail.value), { once: true });
       }
     });
@@ -577,6 +581,10 @@ class GrampsDashboardEditor extends HTMLElement {
           if (key === 'name_entity') el.includeDomains = ['input_text','sensor'];
           if (key === 'age_entity') el.includeDomains = ['sensor','input_number'];
           if (key === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
+          // Filter für Gramps Birthday Sensoren
+          if (['image_entity','name_entity','age_entity','birthdate_entity'].includes(key)) {
+            el.entityFilter = (entityId) => entityId?.startsWith('sensor.next_birthday_');
+          }
           el.addEventListener('value-changed', (ev) => this._updateEntity(idx, key, ev.detail.value), { once: true });
         }
       });

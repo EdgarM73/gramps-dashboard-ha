@@ -91,6 +91,8 @@ Die `entity` Eigenschaft ist optional und wird nur für den Click-Handler verwen
 
 Wenn du Gramps-Sensoren verwendest (z.B. `next_birthday_*`):
 
+Im visuellen Editor filtern die Picker automatisch auf `sensor.next_birthday_*`, damit du die richtigen Sensoren schneller findest.
+
 ```yaml
 type: custom:gramps-dashboard-card
 title: Nächste Geburtstage
