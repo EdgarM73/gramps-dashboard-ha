@@ -10,10 +10,11 @@ Ein anpassbares Dashboard-Template für Home Assistant.
 2. Gehe zu "Frontend"
 3. Klicke auf das Menü (drei Punkte) oben rechts
 4. Wähle "Benutzerdefinierte Repositories"
-5. Füge die URL dieses Repositories hinzu
+5. Füge die URL dieses Repositories hinzu: `https://github.com/EdgarM73/gramps-dashboard-ha`
 6. Wähle "Lovelace" als Kategorie
 7. Klicke auf "Hinzufügen"
 8. Suche nach "Gramps Dashboard" und installiere es
+9. **Wichtig**: Nach der Installation führe einen Hard-Refresh durch (Strg+F5 / Cmd+Shift+R)
 
 ### Manuelle Installation
 
@@ -23,11 +24,30 @@ Ein anpassbares Dashboard-Template für Home Assistant.
    - Gehe zu Einstellungen → Dashboards → Rechts oben auf Menü → Ressourcen
    - Klicke auf "+ Ressource hinzufügen"
    - URL: `/local/gramps-dashboard.js`
-   - Ressourcentyp: JavaScript-Modul
+   - Ressourcentyp: **JavaScript-Modul**
+4. **Wichtig**: Führe einen Hard-Refresh im Browser durch (Strg+F5 / Cmd+Shift+R)
 
 ## Verwendung
 
-Nachdem die Installation abgeschlossen ist, kannst du das Template in deinen Dashboard-Karten verwenden:
+Nachdem die Installation abgeschlossen ist, kannst du das Template in deinen Dashboard-Karten verwenden.
+
+**Wichtig bei Updates**: Nach jedem Update der Karte (z.B. über HACS), führe einen **Hard-Refresh** im Browser durch:
+- **Windows/Linux**: Strg + F5 oder Strg + Shift + R
+- **macOS**: Cmd + Shift + R
+
+Dies stellt sicher, dass der Browser die neueste Version der JavaScript-Datei lädt.
+
+### Mit dem visuellen Editor
+
+1. Öffne dein Dashboard im Bearbeitungsmodus
+2. Klicke auf "+ Karte hinzufügen"
+3. Suche nach "Gramps Dashboard"
+4. Konfiguriere die Karte über den visuellen Editor:
+   - **Allgemein**: Titel, Theme, Header anzeigen
+   - **Globale Entitäten**: Standard-Entitäten für Bild, Name, Alter, Geburtsdatum
+   - **Personen**: Füge Personen hinzu und überschreibe optional die globalen Entitäten
+
+### Mit YAML
 
 ```yaml
 type: custom:gramps-dashboard-card
