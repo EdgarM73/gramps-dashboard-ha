@@ -786,3 +786,4 @@ console.info(
   'color: white; background: #03a9f4; font-weight: 700;',
   'color: #03a9f4; background: white; font-weight: 700;',
 );
+
