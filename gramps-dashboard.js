@@ -10,7 +10,7 @@ class GrampsDashboardCard extends HTMLElement {
     }
 
     this.config = {
-      title: config.title || '',
+      title: config.title || 'Geburtstage',
       entities: config.entities || [],
       theme: config.theme || 'default',
       show_header: config.show_header !== false,
