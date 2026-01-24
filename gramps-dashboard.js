@@ -333,7 +333,7 @@ window.customCards.push({
   name: 'Gramps Dashboard Card',
   description: 'Ein anpassbares Dashboard-Template für Home Assistant',
   preview: true,
-  documentationURL: 'https://github.com/DEIN_USERNAME/gramps_dashboard',
+  documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
 });
 
 console.info(

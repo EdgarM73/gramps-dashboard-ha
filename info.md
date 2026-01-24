@@ -24,3 +24,4 @@ entities:
 ```
 
 Weitere Informationen findest du in der [README](https://github.com/DEIN_USERNAME/gramps_dashboard/blob/main/README.md).
+Weitere Informationen findest du in der [README](https://github.com/EdgarM73/gramps-dashboard-ha/blob/main/README.md).
