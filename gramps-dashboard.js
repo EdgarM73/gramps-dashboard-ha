@@ -200,6 +200,8 @@ class GrampsDashboardCard extends HTMLElement {
 
     container.innerHTML = '';
 
+    let hasValidEntities = false;
+
     this.config.entities.forEach((entityConf, index) => {
       const config = typeof entityConf === 'string' ? 
         { entity: entityConf } : 
@@ -208,8 +210,33 @@ class GrampsDashboardCard extends HTMLElement {
       const button = this.createPersonButton(config);
       if (button) {
         container.appendChild(button);
+        hasValidEntities = true;
       }
     });
+
+    // Zeige hilfreiche Nachricht, wenn keine Entitäten gefunden wurden
+    if (!hasValidEntities && this.config.entities.length > 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 32px; text-align: center; color: var(--gramps-text-secondary);">
+          <ha-icon icon="mdi:alert-circle-outline" style="width: 48px; height: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></ha-icon>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Keine Entitäten gefunden</div>
+          <div style="font-size: 14px; line-height: 1.5;">
+            Die konfigurierten Entitäten existieren nicht in Home Assistant.<br>
+            Bitte erstelle die Entitäten oder bearbeite die Karte im visuellen Editor.
+          </div>
+        </div>
+      `;
+    } else if (this.config.entities.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 32px; text-align: center; color: var(--gramps-text-secondary);">
+          <ha-icon icon="mdi:account-group-outline" style="width: 48px; height: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></ha-icon>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Keine Personen konfiguriert</div>
+          <div style="font-size: 14px; line-height: 1.5;">
+            Bearbeite diese Karte und füge Personen hinzu.
+          </div>
+        </div>
+      `;
+    }
   }
 
   createPersonButton(config) {
@@ -357,14 +384,10 @@ class GrampsDashboardCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-      title: 'Gramps Dashboard',
+      title: 'Familie',
       entities: [
         {
-          entity: 'person.max',
-          name_entity: 'input_text.max_name',
-          age_entity: 'input_number.max_age',
-          birthdate_entity: 'input_text.max_birthdate',
-          image_entity: 'image.max_photo'
+          entity: 'person.home_assistant',
         }
       ],
       theme: 'default',
