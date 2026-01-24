@@ -224,25 +224,35 @@ class GrampsDashboardCard extends HTMLElement {
     const ageId = ageEntity;
     const birthdateId = birthdateEntity;
 
-    const imageEntity_obj = this._hass.states[imageId];
-    const nameEntity_obj = this._hass.states[nameId];
+    const imageEntity_obj = imageId ? this._hass.states[imageId] : null;
+    const nameEntity_obj = nameId ? this._hass.states[nameId] : null;
     const ageEntity_obj = ageId ? this._hass.states[ageId] : null;
     const birthdateEntity_obj = birthdateId ? this._hass.states[birthdateId] : null;
 
+    // Wenn keine Namens-Entität vorhanden ist, versuche die Haupt-Entity
     if (!nameEntity_obj) {
-      console.warn(`Namens-Entität ${nameId} nicht gefunden`);
-      return null;
+      const fallbackEntity = this._hass.states[config.entity];
+      if (!fallbackEntity) {
+        console.warn(`Gramps Dashboard: Entität ${config.entity} nicht gefunden`);
+        return null;
+      }
+      // Zeige friendly_name der Haupt-Entität als Name
+      const button = this.createPersonButtonWithFallback(fallbackEntity, imageEntity_obj, ageEntity_obj, birthdateEntity_obj);
+      button.addEventListener('click', () => {
+        this.fireEvent('hass-more-info', { entityId: config.entity });
+      });
+      return button;
     }
 
     const button = document.createElement('div');
     button.className = 'person-button';
 
-    const name = nameEntity_obj.state || 'Unbekannt';
+    const name = nameEntity_obj.state || nameEntity_obj.attributes?.friendly_name || 'Unbekannt';
     const imageUrl = imageEntity_obj?.attributes?.entity_picture || null;
-    const age = ageEntity_obj?.state || 'N/A';
+    const age = ageEntity_obj?.state || '-';
     const birthdate = birthdateEntity_obj?.state 
       ? this.formatDateGerman(birthdateEntity_obj.state) 
-      : 'N/A';
+      : '-';
 
     button.innerHTML = `
       <div class="person-image">
@@ -265,6 +275,47 @@ class GrampsDashboardCard extends HTMLElement {
     `;
 
     button.addEventListener('click', () => {
+      this.fireEvent('hass-more-info', { entityId: nameId });
+    });
+
+    return button;
+  }
+
+  createPersonButtonWithFallback(entity, imageEntity_obj, ageEntity_obj, birthdateEntity_obj) {
+    const button = document.createElement('div');
+    button.className = 'person-button';
+
+    const name = entity.attributes?.friendly_name || entity.entity_id;
+    const imageUrl = imageEntity_obj?.attributes?.entity_picture || null;
+    const age = ageEntity_obj?.state || '-';
+    const birthdate = birthdateEntity_obj?.state 
+      ? this.formatDateGerman(birthdateEntity_obj.state) 
+      : '-';
+
+    button.innerHTML = `
+      <div class="person-image">
+        ${imageUrl ? 
+          `<img src="${imageUrl}" alt="${name}" />` : 
+          `<ha-icon icon="mdi:account"></ha-icon>`
+        }
+      </div>
+      <div class="person-name">${name}</div>
+      <div class="person-details">
+        <div class="detail-item">
+          <div class="detail-label">Alter</div>
+          <div class="detail-value">${age}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Geburtsdatum</div>
+          <div class="detail-value">${birthdate}</div>
+        </div>
+      </div>
+    `;
+
+    return button;
+  }
+
+  formatDateGerman(dateStr) {
       this.fireEvent('hass-more-info', { entityId: nameId });
     });
 
