@@ -548,13 +548,25 @@ class GrampsDashboardEditor extends HTMLElement {
     // Populate person selector
     this._populatePersonSelector();
 
-    // General inputs
+    // General inputs - bind without 'once' to allow multiple inputs
     const titleEl = this.shadowRoot.getElementById('title');
     const themeEl = this.shadowRoot.getElementById('theme');
     const headerEl = this.shadowRoot.getElementById('show_header');
-    if (titleEl) titleEl.addEventListener('input', (e) => this._updateValue('title', e.target.value));
-    if (themeEl) themeEl.addEventListener('change', (e) => this._updateValue('theme', e.target.value));
-    if (headerEl) headerEl.addEventListener('change', (e) => this._updateValue('show_header', e.target.checked));
+    if (titleEl) {
+      titleEl.addEventListener('input', (e) => {
+        this._updateValue('title', e.target.value);
+      });
+    }
+    if (themeEl) {
+      themeEl.addEventListener('change', (e) => {
+        this._updateValue('theme', e.target.value);
+      });
+    }
+    if (headerEl) {
+      headerEl.addEventListener('change', (e) => {
+        this._updateValue('show_header', e.target.checked);
+      });
+    }
 
     // Person selector
     const personSelector = this.shadowRoot.getElementById('person-selector');
@@ -566,6 +578,15 @@ class GrampsDashboardEditor extends HTMLElement {
         }
       });
     }
+
+    // Setup remove buttons for person cards
+    const removeButtons = this.shadowRoot.querySelectorAll('.remove');
+    removeButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.index, 10);
+        this._removeEntity(idx);
+      });
+    });
   }
 
   _populatePersonSelector() {
@@ -617,12 +638,39 @@ class GrampsDashboardEditor extends HTMLElement {
       birthdate_entity: `sensor.next_birthday_${number}_date`,
       picture_entity: `sensor.next_birthday_${number}_image`
     });
-    this.render();
-    this._updatePickers();
+    this._updateEntityList();
+    this._populatePersonSelector();
     this._fireConfigChanged();
   }
 
-  _updatePickers() {
+  _updateEntityList() {
+    const entitiesContainer = this.shadowRoot?.getElementById('entities');
+    if (!entitiesContainer) return;
+
+    entitiesContainer.innerHTML = this._config.entities.map((e, idx) => {
+      const nameEntity = e.name_entity || '';
+      const match = nameEntity.match(/next_birthday_(\d+)_name/);
+      const personId = match ? match[1] : idx + 1;
+      const personName = this._hass?.states[nameEntity]?.state || this.localize('unknown');
+      return `
+        <div class="entity-card" data-index="${idx}" style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="flex: 1;">
+            <strong>${this.localize('person')} ${personId}</strong> - ${personName}
+          </div>
+          <button class="remove" data-index="${idx}" style="margin-left: 12px;">${this.localize('remove')}</button>
+        </div>
+      `;
+    }).join('');
+
+    // Re-attach remove button listeners
+    const removeButtons = this.shadowRoot.querySelectorAll('.remove');
+    removeButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.index, 10);
+        this._removeEntity(idx);
+      });
+    });
+  }
     if (!this._hass || !this.shadowRoot) return;
 
     // Update remove buttons for person cards
@@ -654,8 +702,8 @@ class GrampsDashboardEditor extends HTMLElement {
   _removeEntity(index) {
     if (!Array.isArray(this._config.entities)) return;
     this._config.entities.splice(index, 1);
-    this.render();
-    this._updatePickers();
+    this._updateEntityList();
+    this._populatePersonSelector();
     this._fireConfigChanged();
   }
 
