@@ -348,6 +348,7 @@ class GrampsDashboardEditor extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
+    this._updatePickers();
   }
 
   setConfig(config) {
@@ -362,6 +363,7 @@ class GrampsDashboardEditor extends HTMLElement {
       entities: Array.isArray(config?.entities) ? JSON.parse(JSON.stringify(config.entities)) : [],
     };
     this.render();
+    this._updatePickers();
   }
 
   render() {
@@ -485,9 +487,22 @@ class GrampsDashboardEditor extends HTMLElement {
     this.shadowRoot.appendChild(editor);
 
     // General inputs
-    this.shadowRoot.getElementById('title').addEventListener('input', (e) => this._updateValue('title', e.target.value));
-    this.shadowRoot.getElementById('theme').addEventListener('change', (e) => this._updateValue('theme', e.target.value));
-    this.shadowRoot.getElementById('show_header').addEventListener('change', (e) => this._updateValue('show_header', e.target.checked));
+    const titleEl = this.shadowRoot.getElementById('title');
+    const themeEl = this.shadowRoot.getElementById('theme');
+    const headerEl = this.shadowRoot.getElementById('show_header');
+    if (titleEl) titleEl.addEventListener('input', (e) => this._updateValue('title', e.target.value));
+    if (themeEl) themeEl.addEventListener('change', (e) => this._updateValue('theme', e.target.value));
+    if (headerEl) headerEl.addEventListener('change', (e) => this._updateValue('show_header', e.target.checked));
+
+    // Add entity button
+    const addBtn = this.shadowRoot.getElementById('add');
+    if (addBtn) addBtn.addEventListener('click', () => this._addEntity());
+  }
+
+  _updatePickers() {
+    if (!this._hass || !this.shadowRoot) return;
+
+    // Update global entity pickers
     const globalPickers = ['image_entity','name_entity','age_entity','birthdate_entity'];
     globalPickers.forEach((id) => {
       const el = this.shadowRoot.getElementById(id);
@@ -499,43 +514,52 @@ class GrampsDashboardEditor extends HTMLElement {
         if (id === 'name_entity') el.includeDomains = ['input_text','sensor'];
         if (id === 'age_entity') el.includeDomains = ['sensor','input_number'];
         if (id === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
-        el.addEventListener('value-changed', (ev) => this._updateValue(id, ev.detail.value));
+        el.addEventListener('value-changed', (ev) => this._updateValue(id, ev.detail.value), { once: true });
       }
     });
 
-    // Entities inputs
+    // Update person entity pickers
     const entitiesContainer = this.shadowRoot.getElementById('entities');
+    if (!entitiesContainer) return;
+
     entitiesContainer.querySelectorAll('.entity-card').forEach((card) => {
       const idx = parseInt(card.dataset.index, 10);
+      
+      // Person picker
       const personPicker = card.querySelector('.entity');
       if (personPicker) {
         personPicker.hass = this._hass;
         personPicker.includeDomains = ['person'];
-        personPicker.value = this._config.entities[idx].entity || '';
-        personPicker.addEventListener('value-changed', (ev) => this._updateEntity(idx, 'entity', ev.detail.value));
+        personPicker.value = this._config.entities[idx]?.entity || '';
+        personPicker.addEventListener('value-changed', (ev) => this._updateEntity(idx, 'entity', ev.detail.value), { once: true });
       }
+
+      // Other pickers
       const imgPicker = card.querySelector('.image_entity');
       const namePicker = card.querySelector('.name_entity');
       const agePicker = card.querySelector('.age_entity');
       const birthPicker = card.querySelector('.birthdate_entity');
+      
       [imgPicker, namePicker, agePicker, birthPicker].forEach((el, i) => {
         if (el) {
-          el.hass = this._hass;
           const key = ['image_entity','name_entity','age_entity','birthdate_entity'][i];
-          el.value = this._config.entities[idx][key] || '';
+          el.hass = this._hass;
+          el.value = this._config.entities[idx]?.[key] || '';
           // Domain suggestions per field
           if (key === 'image_entity') el.includeDomains = ['image','camera','sensor'];
           if (key === 'name_entity') el.includeDomains = ['input_text','sensor'];
           if (key === 'age_entity') el.includeDomains = ['sensor','input_number'];
           if (key === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
-          el.addEventListener('value-changed', (ev) => this._updateEntity(idx, key, ev.detail.value));
+          el.addEventListener('value-changed', (ev) => this._updateEntity(idx, key, ev.detail.value), { once: true });
         }
       });
-      card.querySelector('.remove').addEventListener('click', () => this._removeEntity(idx));
-    });
 
-    // Add entity
-    this.shadowRoot.getElementById('add').addEventListener('click', () => this._addEntity());
+      // Remove button
+      const removeBtn = card.querySelector('.remove');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', () => this._removeEntity(idx), { once: true });
+      }
+    });
   }
 
   _updateValue(key, value) {
@@ -553,6 +577,7 @@ class GrampsDashboardEditor extends HTMLElement {
     this._config.entities = this._config.entities || [];
     this._config.entities.push({ entity: '' });
     this.render();
+    this._updatePickers();
     this._fireConfigChanged();
   }
 
@@ -560,6 +585,7 @@ class GrampsDashboardEditor extends HTMLElement {
     if (!Array.isArray(this._config.entities)) return;
     this._config.entities.splice(index, 1);
     this.render();
+    this._updatePickers();
     this._fireConfigChanged();
   }
 
