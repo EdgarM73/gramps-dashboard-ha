@@ -316,14 +316,7 @@ class GrampsDashboardCard extends HTMLElement {
   }
 
   formatDateGerman(dateStr) {
-      this.fireEvent('hass-more-info', { entityId: nameId });
-    });
-
-    return button;
-  }
-
-  formatDateGerman(dateStr) {
-    if (!dateStr) return 'N/A';
+    if (!dateStr) return '-';
 
     // ISO 8601 (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ssZ)
     const isoMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr);
