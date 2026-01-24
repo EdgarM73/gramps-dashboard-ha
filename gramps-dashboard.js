@@ -72,7 +72,7 @@ class GrampsDashboardCard extends HTMLElement {
 
   setConfig(config) {
     if (!config.entities) {
-      throw new Error('Du musst Entitäten definieren');
+      throw new Error('Du musst Entitaeten definieren');
     }
 
     this.config = {
@@ -87,9 +87,7 @@ class GrampsDashboardCard extends HTMLElement {
       ...config
     };
 
-    // Ensure Lovelace keeps type when editor updates config
     this.config.type = config.type || 'custom:gramps-dashboard-card';
-
     this.render();
   }
 
@@ -280,15 +278,14 @@ class GrampsDashboardCard extends HTMLElement {
       }
     });
 
-    // Zeige hilfreiche Nachricht, wenn keine Entitäten gefunden wurden
     if (!hasValidEntities && this.config.entities.length > 0) {
       container.innerHTML = `
         <div style="grid-column: 1 / -1; padding: 32px; text-align: center; color: var(--gramps-text-secondary);">
           <ha-icon icon="mdi:alert-circle-outline" style="width: 48px; height: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></ha-icon>
-          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Keine Entitäten gefunden</div>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Keine Entitaeten gefunden</div>
           <div style="font-size: 14px; line-height: 1.5;">
-            Die konfigurierten Entitäten existieren nicht in Home Assistant.<br>
-            Bitte erstelle die Entitäten oder bearbeite die Karte im visuellen Editor.
+            Die konfigurierten Entitaeten existieren nicht in Home Assistant.<br>
+            Bitte erstelle die Entitaeten oder bearbeite die Karte im visuellen Editor.
           </div>
         </div>
       `;
@@ -298,7 +295,7 @@ class GrampsDashboardCard extends HTMLElement {
           <ha-icon icon="mdi:account-group-outline" style="width: 48px; height: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></ha-icon>
           <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${this.localize('no_entities')}</div>
           <div style="font-size: 14px; line-height: 1.5;">
-            Bearbeite diese Karte und füge Personen hinzu.
+            Bearbeite diese Karte und fuege Personen hinzu.
           </div>
         </div>
       `;
@@ -306,13 +303,11 @@ class GrampsDashboardCard extends HTMLElement {
   }
 
   createPersonButton(config) {
-    // Unterstütze beide: picture_entity (Gramps) und image_entity
     const imageEntity = config.picture_entity || config.image_entity || this.config.picture_entity || this.config.image_entity;
     const nameEntity = config.name_entity || this.config.name_entity;
     const ageEntity = config.age_entity || this.config.age_entity;
     const birthdateEntity = config.birthdate_entity || this.config.birthdate_entity;
 
-    // Wenn keine name_entity vorhanden, kann keine Person angezeigt werden
     if (!nameEntity) {
       console.warn(`Gramps Dashboard: name_entity fehlt in der Konfiguration`);
       return null;
@@ -324,7 +319,7 @@ class GrampsDashboardCard extends HTMLElement {
     const birthdateEntity_obj = birthdateEntity ? this._hass.states[birthdateEntity] : null;
 
     if (!nameEntity_obj) {
-      console.warn(`Gramps Dashboard: Namens-Entität ${nameEntity} nicht gefunden`);
+      console.warn(`Gramps Dashboard: Namens-Entitaet ${nameEntity} nicht gefunden`);
       return null;
     }
 
@@ -358,7 +353,6 @@ class GrampsDashboardCard extends HTMLElement {
       </div>
     `;
 
-    // Click öffnet die name_entity Details (oder entity falls vorhanden)
     button.addEventListener('click', () => {
       this.fireEvent('hass-more-info', { entityId: config.entity || nameEntity });
     });
@@ -369,18 +363,15 @@ class GrampsDashboardCard extends HTMLElement {
   formatDateGerman(dateStr) {
     if (!dateStr) return '-';
 
-    // ISO 8601 (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ssZ)
     const isoMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr);
     if (isoMatch) {
       const [, y, m, d] = isoMatch;
       return `${d}.${m}.${y}`;
     }
 
-    // Already dd.mm.yyyy
     const deMatch = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(dateStr);
     if (deMatch) return dateStr;
 
-    // Fallback: Date parser
     const parsed = new Date(dateStr);
     if (!isNaN(parsed.getTime())) {
       const dd = String(parsed.getDate()).padStart(2, '0');
@@ -389,7 +380,6 @@ class GrampsDashboardCard extends HTMLElement {
       return `${dd}.${mm}.${yyyy}`;
     }
 
-    // If parsing failed, return original
     return dateStr;
   }
 
@@ -549,10 +539,8 @@ class GrampsDashboardEditor extends HTMLElement {
     this.shadowRoot.innerHTML = '';
     this.shadowRoot.appendChild(editor);
 
-    // Populate person selector
     this._populatePersonSelector();
 
-    // General inputs - bind without 'once' to allow multiple inputs
     const titleEl = this.shadowRoot.getElementById('title');
     const themeEl = this.shadowRoot.getElementById('theme');
     const headerEl = this.shadowRoot.getElementById('show_header');
@@ -572,18 +560,16 @@ class GrampsDashboardEditor extends HTMLElement {
       });
     }
 
-    // Person selector
     const personSelector = this.shadowRoot.getElementById('person-selector');
     if (personSelector) {
       personSelector.addEventListener('change', (e) => {
         if (e.target.value) {
           this._addPersonByNumber(e.target.value);
-          e.target.value = ''; // Reset selector
+          e.target.value = '';
         }
       });
     }
 
-    // Add all button
     const addAllBtn = this.shadowRoot.getElementById('add-all-btn');
     if (addAllBtn) {
       addAllBtn.addEventListener('click', () => {
@@ -591,7 +577,6 @@ class GrampsDashboardEditor extends HTMLElement {
       });
     }
 
-    // Setup remove buttons for person cards
     const removeButtons = this.shadowRoot.querySelectorAll('.remove');
     removeButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -607,7 +592,6 @@ class GrampsDashboardEditor extends HTMLElement {
     const selector = this.shadowRoot.getElementById('person-selector');
     if (!selector) return;
 
-    // Find all next_birthday_*_name sensors
     const nameSensors = Object.keys(this._hass.states)
       .filter(entityId => entityId.match(/^sensor\.next_birthday_(\d+)_name$/))
       .sort((a, b) => {
@@ -616,10 +600,8 @@ class GrampsDashboardEditor extends HTMLElement {
         return numA - numB;
       });
 
-    // Clear existing options except first
-    selector.innerHTML = '<option value="">-- Wähle eine Person --</option>';
+    selector.innerHTML = '<option value="">-- Waehle eine Person --</option>';
 
-    // Add option for each person
     nameSensors.forEach(entityId => {
       const match = entityId.match(/^sensor\.next_birthday_(\d+)_name$/);
       if (match) {
@@ -627,7 +609,6 @@ class GrampsDashboardEditor extends HTMLElement {
         const state = this._hass.states[entityId];
         const name = state?.state || `Person ${number}`;
         
-        // Check if already added
         const alreadyAdded = this._config.entities.some(e => 
           e.name_entity === entityId
         );
@@ -658,7 +639,6 @@ class GrampsDashboardEditor extends HTMLElement {
   _addAllPersons() {
     if (!this._hass) return;
 
-    // Find all next_birthday_*_name sensors
     const nameSensors = Object.keys(this._hass.states)
       .filter(entityId => entityId.match(/^sensor\.next_birthday_(\d+)_name$/))
       .sort((a, b) => {
@@ -673,7 +653,6 @@ class GrampsDashboardEditor extends HTMLElement {
       if (match) {
         const number = match[1];
         
-        // Check if already added
         const alreadyAdded = this._config.entities.some(e => 
           e.name_entity === entityId
         );
@@ -716,7 +695,6 @@ class GrampsDashboardEditor extends HTMLElement {
       `;
     }).join('');
 
-    // Re-attach remove button listeners
     const removeButtons = this.shadowRoot.querySelectorAll('.remove');
     removeButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -729,14 +707,12 @@ class GrampsDashboardEditor extends HTMLElement {
   _updatePickers() {
     if (!this._hass || !this.shadowRoot) return;
 
-    // Update remove buttons for person cards
     const entitiesContainer = this.shadowRoot.getElementById('entities');
     if (!entitiesContainer) return;
 
     entitiesContainer.querySelectorAll('.entity-card').forEach((card) => {
       const idx = parseInt(card.dataset.index, 10);
       
-      // Remove button
       const removeBtn = card.querySelector('.remove');
       if (removeBtn) {
         removeBtn.addEventListener('click', () => this._removeEntity(idx), { once: true });
@@ -764,7 +740,6 @@ class GrampsDashboardEditor extends HTMLElement {
   }
 
   _fireConfigChanged() {
-    // Always include type to avoid Lovelace editor errors
     const cfg = { type: 'custom:gramps-dashboard-card', ...this._config };
     this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: cfg } }));
   }
@@ -776,7 +751,7 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'gramps-dashboard-card',
   name: 'Gramps Dashboard Card',
-  description: 'Ein anpassbares Dashboard-Template für Home Assistant',
+  description: 'Ein anpassbares Dashboard-Template fuer Home Assistant',
   preview: true,
   documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
 });
@@ -786,4 +761,3 @@ console.info(
   'color: white; background: #03a9f4; font-weight: 700;',
   'color: #03a9f4; background: white; font-weight: 700;',
 );
-
