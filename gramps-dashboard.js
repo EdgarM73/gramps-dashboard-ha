@@ -323,9 +323,215 @@ class GrampsDashboardCard extends HTMLElement {
       theme: 'default',
     };
   }
+
+  static getConfigElement() {
+    return document.createElement('gramps-dashboard-editor');
+  }
 }
 
 customElements.define('gramps-dashboard-card', GrampsDashboardCard);
+
+class GrampsDashboardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._config = {};
+    this._hass = null;
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+  }
+
+  setConfig(config) {
+    this._config = {
+      title: config?.title || '',
+      show_header: config?.show_header !== false,
+      theme: config?.theme || 'default',
+      image_entity: config?.image_entity || '',
+      name_entity: config?.name_entity || '',
+      age_entity: config?.age_entity || '',
+      birthdate_entity: config?.birthdate_entity || '',
+      entities: Array.isArray(config?.entities) ? JSON.parse(JSON.stringify(config.entities)) : [],
+    };
+    this.render();
+  }
+
+  render() {
+    const styles = `
+      :host { display: block; }
+      .editor {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 8px;
+      }
+      .full { grid-column: 1 / -1; }
+      fieldset {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px;
+        padding: 12px;
+      }
+      legend { font-weight: 600; }
+      label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+      input, select { padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .entities { display: flex; flex-direction: column; gap: 12px; }
+      .entity-card { border: 1px dashed rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; }
+      .actions { display: flex; gap: 8px; }
+      button { padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; }
+    `;
+
+    const editor = document.createElement('div');
+    editor.className = 'editor';
+    editor.innerHTML = `
+      <style>${styles}</style>
+      <fieldset class="full">
+        <legend>Allgemein</legend>
+        <div class="row">
+          <label>
+            Titel
+            <input id="title" type="text" value="${this._config.title}" />
+          </label>
+          <label>
+            Theme
+            <select id="theme" value="${this._config.theme}">
+              <option value="default" ${this._config.theme === 'default' ? 'selected' : ''}>Default</option>
+              <option value="dark" ${this._config.theme === 'dark' ? 'selected' : ''}>Dark</option>
+            </select>
+          </label>
+        </div>
+        <label class="full" style="margin-top:8px;">
+          <input id="show_header" type="checkbox" ${this._config.show_header ? 'checked' : ''} /> Header anzeigen
+        </label>
+      </fieldset>
+
+      <fieldset class="full">
+        <legend>Globale Entitäten</legend>
+        <div class="row">
+          <label>
+            Bild-Entität
+            <input id="image_entity" type="text" value="${this._config.image_entity}" placeholder="image.xyz" />
+          </label>
+          <label>
+            Namens-Entität
+            <input id="name_entity" type="text" value="${this._config.name_entity}" placeholder="input_text.xyz_name" />
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            Alters-Entität
+            <input id="age_entity" type="text" value="${this._config.age_entity}" placeholder="input_number.xyz_age" />
+          </label>
+          <label>
+            Geburtsdatum-Entität
+            <input id="birthdate_entity" type="text" value="${this._config.birthdate_entity}" placeholder="input_text.xyz_birthdate" />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="full">
+        <legend>Personen</legend>
+        <div class="entities" id="entities">
+          ${this._config.entities.map((e, idx) => `
+            <div class="entity-card" data-index="${idx}">
+              <div class="row">
+                <label>
+                  Person-Entität
+                  <input class="entity" type="text" value="${e.entity || ''}" placeholder="person.max" />
+                </label>
+                <label>
+                  Bild-Entität (optional)
+                  <input class="image_entity" type="text" value="${e.image_entity || ''}" />
+                </label>
+              </div>
+              <div class="row">
+                <label>
+                  Namens-Entität (optional)
+                  <input class="name_entity" type="text" value="${e.name_entity || ''}" />
+                </label>
+                <label>
+                  Alters-Entität (optional)
+                  <input class="age_entity" type="text" value="${e.age_entity || ''}" />
+                </label>
+              </div>
+              <div class="row">
+                <label>
+                  Geburtsdatum-Entität (optional)
+                  <input class="birthdate_entity" type="text" value="${e.birthdate_entity || ''}" />
+                </label>
+                <div class="actions" style="align-items:end;">
+                  <button class="remove" data-index="${idx}">Entfernen</button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="actions" style="margin-top:8px;">
+          <button id="add">Person hinzufügen</button>
+        </div>
+      </fieldset>
+    `;
+
+    this.shadowRoot.innerHTML = '';
+    this.shadowRoot.appendChild(editor);
+
+    // General inputs
+    this.shadowRoot.getElementById('title').addEventListener('input', (e) => this._updateValue('title', e.target.value));
+    this.shadowRoot.getElementById('theme').addEventListener('change', (e) => this._updateValue('theme', e.target.value));
+    this.shadowRoot.getElementById('show_header').addEventListener('change', (e) => this._updateValue('show_header', e.target.checked));
+    this.shadowRoot.getElementById('image_entity').addEventListener('input', (e) => this._updateValue('image_entity', e.target.value));
+    this.shadowRoot.getElementById('name_entity').addEventListener('input', (e) => this._updateValue('name_entity', e.target.value));
+    this.shadowRoot.getElementById('age_entity').addEventListener('input', (e) => this._updateValue('age_entity', e.target.value));
+    this.shadowRoot.getElementById('birthdate_entity').addEventListener('input', (e) => this._updateValue('birthdate_entity', e.target.value));
+
+    // Entities inputs
+    const entitiesContainer = this.shadowRoot.getElementById('entities');
+    entitiesContainer.querySelectorAll('.entity-card').forEach((card) => {
+      const idx = parseInt(card.dataset.index, 10);
+      card.querySelector('.entity').addEventListener('input', (e) => this._updateEntity(idx, 'entity', e.target.value));
+      card.querySelector('.image_entity').addEventListener('input', (e) => this._updateEntity(idx, 'image_entity', e.target.value));
+      card.querySelector('.name_entity').addEventListener('input', (e) => this._updateEntity(idx, 'name_entity', e.target.value));
+      card.querySelector('.age_entity').addEventListener('input', (e) => this._updateEntity(idx, 'age_entity', e.target.value));
+      card.querySelector('.birthdate_entity').addEventListener('input', (e) => this._updateEntity(idx, 'birthdate_entity', e.target.value));
+      card.querySelector('.remove').addEventListener('click', () => this._removeEntity(idx));
+    });
+
+    // Add entity
+    this.shadowRoot.getElementById('add').addEventListener('click', () => this._addEntity());
+  }
+
+  _updateValue(key, value) {
+    this._config[key] = value;
+    this._fireConfigChanged();
+  }
+
+  _updateEntity(index, key, value) {
+    if (!this._config.entities[index]) return;
+    this._config.entities[index][key] = value;
+    this._fireConfigChanged();
+  }
+
+  _addEntity() {
+    this._config.entities = this._config.entities || [];
+    this._config.entities.push({ entity: '' });
+    this.render();
+    this._fireConfigChanged();
+  }
+
+  _removeEntity(index) {
+    if (!Array.isArray(this._config.entities)) return;
+    this._config.entities.splice(index, 1);
+    this.render();
+    this._fireConfigChanged();
+  }
+
+  _fireConfigChanged() {
+    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
+  }
+}
+
+customElements.define('gramps-dashboard-editor', GrampsDashboardEditor);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
