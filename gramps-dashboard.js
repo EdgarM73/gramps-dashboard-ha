@@ -1,7 +1,70 @@
+const TRANSLATIONS = {
+  de: {
+    birthdays: 'Geburtstage',
+    years: 'Jahre',
+    birthday: 'Geburtstag',
+    no_entities: 'Keine Personen konfiguriert',
+    title: 'Titel',
+    theme: 'Theme',
+    show_header: 'Header anzeigen',
+    persons: 'Personen',
+    add_person: 'Person hinzufügen',
+    select_person: '-- Wähle eine Person --',
+    remove: 'Entfernen',
+    person: 'Person',
+    unknown: 'Unbekannt',
+    general: 'Allgemein',
+    default: 'Standard',
+    dark: 'Dunkel'
+  },
+  en: {
+    birthdays: 'Birthdays',
+    years: 'years',
+    birthday: 'Birthday',
+    no_entities: 'No persons configured',
+    title: 'Title',
+    theme: 'Theme',
+    show_header: 'Show header',
+    persons: 'Persons',
+    add_person: 'Add person',
+    select_person: '-- Select a person --',
+    remove: 'Remove',
+    person: 'Person',
+    unknown: 'Unknown',
+    general: 'General',
+    default: 'Default',
+    dark: 'Dark'
+  },
+  fr: {
+    birthdays: 'Anniversaires',
+    years: 'ans',
+    birthday: 'Anniversaire',
+    no_entities: 'Aucune personne configurée',
+    title: 'Titre',
+    theme: 'Thème',
+    show_header: 'Afficher l\'en-tête',
+    persons: 'Personnes',
+    add_person: 'Ajouter une personne',
+    select_person: '-- Sélectionner une personne --',
+    remove: 'Supprimer',
+    person: 'Personne',
+    unknown: 'Inconnu',
+    general: 'Général',
+    default: 'Par défaut',
+    dark: 'Sombre'
+  }
+};
+
 class GrampsDashboardCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+  }
+
+  localize(key) {
+    const lang = this._hass?.locale?.language || this._hass?.language || 'de';
+    const langCode = lang.split('-')[0];
+    return TRANSLATIONS[langCode]?.[key] || TRANSLATIONS['de'][key] || key;
   }
 
   setConfig(config) {
@@ -10,7 +73,7 @@ class GrampsDashboardCard extends HTMLElement {
     }
 
     this.config = {
-      title: config.title || 'Geburtstage',
+      title: config.title === 'Familie' ? null : config.title,
       entities: config.entities || [],
       theme: config.theme || 'default',
       show_header: config.show_header !== false,
@@ -183,7 +246,7 @@ class GrampsDashboardCard extends HTMLElement {
         }
       </style>
 
-      ${this.config.show_header ? `<div class="card-header">${this.config.title}</div>` : ''}
+      ${this.config.show_header ? `<div class="card-header">${this.config.title || this.localize('birthdays')}</div>` : ''}
       <div class="card-content ${this.config.theme === 'dark' ? 'theme-dark' : ''}" id="entities-container">
       </div>
     `;
@@ -230,7 +293,7 @@ class GrampsDashboardCard extends HTMLElement {
       container.innerHTML = `
         <div style="grid-column: 1 / -1; padding: 32px; text-align: center; color: var(--gramps-text-secondary);">
           <ha-icon icon="mdi:account-group-outline" style="width: 48px; height: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></ha-icon>
-          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Keine Personen konfiguriert</div>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${this.localize('no_entities')}</div>
           <div style="font-size: 14px; line-height: 1.5;">
             Bearbeite diese Karte und füge Personen hinzu.
           </div>
@@ -265,7 +328,7 @@ class GrampsDashboardCard extends HTMLElement {
     const button = document.createElement('div');
     button.className = 'person-button';
 
-    const name = nameEntity_obj.state || nameEntity_obj.attributes?.friendly_name || 'Unbekannt';
+    const name = nameEntity_obj.state || nameEntity_obj.attributes?.friendly_name || this.localize('unknown');
     const imageUrl = imageEntity_obj?.attributes?.entity_picture || null;
     const age = ageEntity_obj?.state || '-';
     const birthdate = birthdateEntity_obj?.state 
@@ -282,11 +345,11 @@ class GrampsDashboardCard extends HTMLElement {
       <div class="person-name">${name}</div>
       <div class="person-details">
         <div class="detail-item">
-          <div class="detail-label">Alter</div>
+          <div class="detail-label">${this.localize('years')}</div>
           <div class="detail-value">${age}</div>
         </div>
         <div class="detail-item">
-          <div class="detail-label">Geburtsdatum</div>
+          <div class="detail-label">${this.localize('birthday')}</div>
           <div class="detail-value">${birthdate}</div>
         </div>
       </div>
@@ -342,7 +405,6 @@ class GrampsDashboardCard extends HTMLElement {
 
   static getStubConfig() {
     return {
-      title: 'Familie',
       entities: [
         {
           name_entity: 'sensor.next_birthday_1_name',
@@ -372,6 +434,12 @@ class GrampsDashboardEditor extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this._config = {};
     this._hass = null;
+  }
+
+  localize(key) {
+    const lang = this._hass?.locale?.language || this._hass?.language || 'de';
+    const langCode = lang.split('-')[0];
+    return TRANSLATIONS[langCode]?.[key] || TRANSLATIONS['de'][key] || key;
   }
 
   set hass(hass) {
@@ -426,48 +494,48 @@ class GrampsDashboardEditor extends HTMLElement {
     editor.innerHTML = `
       <style>${styles}</style>
       <fieldset class="full">
-        <legend>Allgemein</legend>
+        <legend>${this.localize('general')}</legend>
         <div class="row">
           <label>
-            Titel
-            <input id="title" type="text" value="${this._config.title}" />
+            ${this.localize('title')}
+            <input id="title" type="text" value="${this._config.title || ''}" placeholder="${this.localize('birthdays')}" />
           </label>
           <label>
-            Theme
+            ${this.localize('theme')}
             <select id="theme" value="${this._config.theme}">
-              <option value="default" ${this._config.theme === 'default' ? 'selected' : ''}>Default</option>
-              <option value="dark" ${this._config.theme === 'dark' ? 'selected' : ''}>Dark</option>
+              <option value="default" ${this._config.theme === 'default' ? 'selected' : ''}>${this.localize('default')}</option>
+              <option value="dark" ${this._config.theme === 'dark' ? 'selected' : ''}>${this.localize('dark')}</option>
             </select>
           </label>
         </div>
         <label class="full" style="margin-top:8px;">
-          <input id="show_header" type="checkbox" ${this._config.show_header ? 'checked' : ''} /> Header anzeigen
+          <input id="show_header" type="checkbox" ${this._config.show_header ? 'checked' : ''} /> ${this.localize('show_header')}
         </label>
       </fieldset>
 
       <fieldset class="full">
-        <legend>Personen</legend>
+        <legend>${this.localize('persons')}</legend>
         <div class="entities" id="entities">
           ${this._config.entities.map((e, idx) => {
             const nameEntity = e.name_entity || '';
             const match = nameEntity.match(/next_birthday_(\d+)_name/);
             const personId = match ? match[1] : idx + 1;
-            const personName = this._hass?.states[nameEntity]?.state || 'Unbekannt';
+            const personName = this._hass?.states[nameEntity]?.state || this.localize('unknown');
             return `
             <div class="entity-card" data-index="${idx}" style="display: flex; justify-content: space-between; align-items: center;">
               <div style="flex: 1;">
-                <strong>Person ${personId}</strong> - ${personName}
+                <strong>${this.localize('person')} ${personId}</strong> - ${personName}
               </div>
-              <button class="remove" data-index="${idx}" style="margin-left: 12px;">Entfernen</button>
+              <button class="remove" data-index="${idx}" style="margin-left: 12px;">${this.localize('remove')}</button>
             </div>
           `;
           }).join('')}
         </div>
         <div class="actions" style="margin-top:8px;">
           <label style="flex: 1;">
-            Person hinzufügen
+            ${this.localize('add_person')}
             <select id="person-selector" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2);">
-              <option value="">-- Wähle eine Person --</option>
+              <option value="">${this.localize('select_person')}</option>
             </select>
           </label>
         </div>
