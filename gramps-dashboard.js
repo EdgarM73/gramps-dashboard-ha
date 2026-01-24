@@ -21,6 +21,9 @@ class GrampsDashboardCard extends HTMLElement {
       ...config
     };
 
+    // Ensure Lovelace keeps type when editor updates config
+    this.config.type = config.type || 'custom:gramps-dashboard-card';
+
     this.render();
   }
 
@@ -366,22 +369,23 @@ class GrampsDashboardEditor extends HTMLElement {
       :host { display: block; }
       .editor {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 16px;
         padding: 8px;
       }
       .full { grid-column: 1 / -1; }
       fieldset {
-        border: 1px solid rgba(0,0,0,0.1);
+        border: 1px solid var(--divider-color, rgba(0,0,0,0.1));
         border-radius: 8px;
         padding: 12px;
       }
       legend { font-weight: 600; }
       label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
       input, select { padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); }
+      ha-entity-picker { width: 100%; }
       .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .entities { display: flex; flex-direction: column; gap: 12px; }
-      .entity-card { border: 1px dashed rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; }
+      .entity-card { border: 1px solid var(--divider-color, rgba(0,0,0,0.1)); border-radius: 8px; padding: 12px; }
       .actions { display: flex; gap: 8px; }
       button { padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; }
     `;
@@ -442,7 +446,7 @@ class GrampsDashboardEditor extends HTMLElement {
               <div class="row">
                 <label>
                   Person-Entität
-                  <input class="entity" type="text" value="${e.entity || ''}" placeholder="person.max" />
+                  <ha-entity-picker class="entity"></ha-entity-picker>
                 </label>
                 <label>
                   Bild-Entität (optional)
@@ -490,6 +494,11 @@ class GrampsDashboardEditor extends HTMLElement {
       if (el) {
         el.hass = this._hass;
         el.value = this._config[id] || '';
+        // Suggest appropriate domains
+        if (id === 'image_entity') el.includeDomains = ['image','camera','sensor'];
+        if (id === 'name_entity') el.includeDomains = ['input_text','sensor'];
+        if (id === 'age_entity') el.includeDomains = ['sensor','input_number'];
+        if (id === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
         el.addEventListener('value-changed', (ev) => this._updateValue(id, ev.detail.value));
       }
     });
@@ -498,7 +507,13 @@ class GrampsDashboardEditor extends HTMLElement {
     const entitiesContainer = this.shadowRoot.getElementById('entities');
     entitiesContainer.querySelectorAll('.entity-card').forEach((card) => {
       const idx = parseInt(card.dataset.index, 10);
-      card.querySelector('.entity').addEventListener('input', (e) => this._updateEntity(idx, 'entity', e.target.value));
+      const personPicker = card.querySelector('.entity');
+      if (personPicker) {
+        personPicker.hass = this._hass;
+        personPicker.includeDomains = ['person'];
+        personPicker.value = this._config.entities[idx].entity || '';
+        personPicker.addEventListener('value-changed', (ev) => this._updateEntity(idx, 'entity', ev.detail.value));
+      }
       const imgPicker = card.querySelector('.image_entity');
       const namePicker = card.querySelector('.name_entity');
       const agePicker = card.querySelector('.age_entity');
@@ -508,6 +523,11 @@ class GrampsDashboardEditor extends HTMLElement {
           el.hass = this._hass;
           const key = ['image_entity','name_entity','age_entity','birthdate_entity'][i];
           el.value = this._config.entities[idx][key] || '';
+          // Domain suggestions per field
+          if (key === 'image_entity') el.includeDomains = ['image','camera','sensor'];
+          if (key === 'name_entity') el.includeDomains = ['input_text','sensor'];
+          if (key === 'age_entity') el.includeDomains = ['sensor','input_number'];
+          if (key === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
           el.addEventListener('value-changed', (ev) => this._updateEntity(idx, key, ev.detail.value));
         }
       });
@@ -544,7 +564,9 @@ class GrampsDashboardEditor extends HTMLElement {
   }
 
   _fireConfigChanged() {
-    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this._config } }));
+    // Always include type to avoid Lovelace editor errors
+    const cfg = { type: 'custom:gramps-dashboard-card', ...this._config };
+    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: cfg } }));
   }
 }
 
