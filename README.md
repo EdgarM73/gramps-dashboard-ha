@@ -67,26 +67,49 @@ entities:
 | `theme` | string | `default` | Theme-Name (`default`, `dark`) |
 | `show_header` | boolean | `true` | Header anzeigen |
 | `image_entity` | string | Optional | Entity für Profilbild (global) |
-| `name_entity` | string | Optional | Entity für Name (global) |
+| `name_entity` | string | Optional | Entity für Name (global) - **Erforderlich pro Person** |
 | `age_entity` | string | Optional | Entity für Alter (global) |
 | `birthdate_entity` | string | Optional | Entity für Geburtsdatum (global) |
 
 ## Entity-Konfiguration
 
-Jede Person kann mit individuellen Entitäten konfiguriert werden:
+Jede Person benötigt mindestens eine `name_entity`. Optionale Felder können individuell oder global gesetzt werden:
 
 ```yaml
 entities:
-  - entity: person.max
-    name_entity: input_text.max_name
-    age_entity: input_number.max_age
-    birthdate_entity: input_text.max_birthdate
-    image_entity: image.max_photo
+  - name_entity: sensor.next_birthday_1_name
+    age_entity: sensor.next_birthday_1_age
+    birthdate_entity: sensor.next_birthday_1_date
+    image_entity: sensor.next_birthday_1_picture
 ```
+
+Die `entity` Eigenschaft ist optional und wird nur für den Click-Handler verwendet (öffnet More-Info Dialog).
 
 ## Beispiele
 
-### Einfaches Beispiel
+### Gramps Integration (empfohlen)
+
+Wenn du Gramps-Sensoren verwendest (z.B. `next_birthday_*`):
+
+```yaml
+type: custom:gramps-dashboard-card
+title: Nächste Geburtstage
+entities:
+  - name_entity: sensor.next_birthday_1_name
+    age_entity: sensor.next_birthday_1_age
+    birthdate_entity: sensor.next_birthday_1_date
+    image_entity: sensor.next_birthday_1_picture
+  - name_entity: sensor.next_birthday_2_name
+    age_entity: sensor.next_birthday_2_age
+    birthdate_entity: sensor.next_birthday_2_date
+    image_entity: sensor.next_birthday_2_picture
+  - name_entity: sensor.next_birthday_3_name
+    age_entity: sensor.next_birthday_3_age
+    birthdate_entity: sensor.next_birthday_3_date
+    image_entity: sensor.next_birthday_3_picture
+```
+
+### Mit Home Assistant Personen
 
 ```yaml
 type: custom:gramps-dashboard-card
@@ -94,26 +117,22 @@ title: Familie
 entities:
   - entity: person.max
     name_entity: input_text.max_name
-    age_entity: input_number.max_age
-    birthdate_entity: input_text.max_birthdate
-    image_entity: image.max_photo
+    age_entity: sensor.max_age
+    birthdate_entity: sensor.max_birthdate
 ```
 
 ### Mit globalen Einstellungen
+
+Wenn alle Sensoren dem gleichen Muster folgen, kannst du globale Werte setzen:
 
 ```yaml
 type: custom:gramps-dashboard-card
 title: Meine Familie
 theme: dark
 show_header: true
-image_entity: image.default_photo
-name_entity: input_text.name
-age_entity: input_number.age
-birthdate_entity: input_text.birthdate
 entities:
-  - entity: person.max
-  - entity: person.sarah
-  - entity: person.kids
+  - name_entity: sensor.person_1_name
+    age_entity: sensor.person_1_age
 ```
 
 ### Layout-Ergebnis
