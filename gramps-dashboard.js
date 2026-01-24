@@ -725,6 +725,8 @@ class GrampsDashboardEditor extends HTMLElement {
       });
     });
   }
+
+  _updatePickers() {
     if (!this._hass || !this.shadowRoot) return;
 
     // Update remove buttons for person cards
