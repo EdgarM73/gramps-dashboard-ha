@@ -240,7 +240,8 @@ class GrampsDashboardCard extends HTMLElement {
   }
 
   createPersonButton(config) {
-    const imageEntity = config.image_entity || this.config.image_entity;
+    // Unterstütze beide: picture_entity (Gramps) und image_entity
+    const imageEntity = config.picture_entity || config.image_entity || this.config.picture_entity || this.config.image_entity;
     const nameEntity = config.name_entity || this.config.name_entity;
     const ageEntity = config.age_entity || this.config.age_entity;
     const birthdateEntity = config.birthdate_entity || this.config.birthdate_entity;
@@ -347,7 +348,7 @@ class GrampsDashboardCard extends HTMLElement {
           name_entity: 'sensor.next_birthday_1_name',
           age_entity: 'sensor.next_birthday_1_age',
           birthdate_entity: 'sensor.next_birthday_1_date',
-          image_entity: 'sensor.next_birthday_1_picture'
+          picture_entity: 'sensor.next_birthday_1_picture'
         }
       ],
       theme: 'default',
@@ -383,7 +384,8 @@ class GrampsDashboardEditor extends HTMLElement {
       title: config?.title || '',
       show_header: config?.show_header !== false,
       theme: config?.theme || 'default',
-      image_entity: config?.image_entity || '',
+      image_entity: config?.image_entity || config?.picture_entity || '',
+      picture_entity: config?.picture_entity || config?.image_entity || '',
       name_entity: config?.name_entity || '',
       age_entity: config?.age_entity || '',
       birthdate_entity: config?.birthdate_entity || '',
@@ -448,7 +450,7 @@ class GrampsDashboardEditor extends HTMLElement {
         <div class="row">
           <label>
             Bild-Entität
-            <ha-entity-picker id="image_entity"></ha-entity-picker>
+            <ha-entity-picker id="picture_entity"></ha-entity-picker>
           </label>
           <label>
             Namens-Entität
@@ -479,7 +481,7 @@ class GrampsDashboardEditor extends HTMLElement {
                 </label>
                 <label>
                   Bild-Entität (optional)
-                  <ha-entity-picker class="image_entity"></ha-entity-picker>
+                  <ha-entity-picker class="picture_entity"></ha-entity-picker>
                 </label>
               </div>
               <div class="row">
@@ -530,19 +532,19 @@ class GrampsDashboardEditor extends HTMLElement {
     if (!this._hass || !this.shadowRoot) return;
 
     // Update global entity pickers
-    const globalPickers = ['image_entity','name_entity','age_entity','birthdate_entity'];
+    const globalPickers = ['picture_entity','name_entity','age_entity','birthdate_entity'];
     globalPickers.forEach((id) => {
       const el = this.shadowRoot.getElementById(id);
       if (el) {
         el.hass = this._hass;
         el.value = this._config[id] || '';
         // Suggest appropriate domains
-        if (id === 'image_entity') el.includeDomains = ['image','camera','sensor'];
+        if (id === 'picture_entity') el.includeDomains = ['image','camera','sensor'];
         if (id === 'name_entity') el.includeDomains = ['input_text','sensor'];
         if (id === 'age_entity') el.includeDomains = ['sensor','input_number'];
         if (id === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
         // Filter für Gramps Birthday Sensoren
-        if (['image_entity','name_entity','age_entity','birthdate_entity'].includes(id)) {
+        if (['picture_entity','name_entity','age_entity','birthdate_entity'].includes(id)) {
           el.entityFilter = (entityId) => entityId?.startsWith('sensor.next_birthday_');
         }
         el.addEventListener('value-changed', (ev) => this._updateValue(id, ev.detail.value), { once: true });
@@ -566,23 +568,23 @@ class GrampsDashboardEditor extends HTMLElement {
       }
 
       // Other pickers
-      const imgPicker = card.querySelector('.image_entity');
+      const imgPicker = card.querySelector('.picture_entity');
       const namePicker = card.querySelector('.name_entity');
       const agePicker = card.querySelector('.age_entity');
       const birthPicker = card.querySelector('.birthdate_entity');
       
       [imgPicker, namePicker, agePicker, birthPicker].forEach((el, i) => {
         if (el) {
-          const key = ['image_entity','name_entity','age_entity','birthdate_entity'][i];
+          const key = ['picture_entity','name_entity','age_entity','birthdate_entity'][i];
           el.hass = this._hass;
           el.value = this._config.entities[idx]?.[key] || '';
           // Domain suggestions per field
-          if (key === 'image_entity') el.includeDomains = ['image','camera','sensor'];
+          if (key === 'picture_entity') el.includeDomains = ['image','camera','sensor'];
           if (key === 'name_entity') el.includeDomains = ['input_text','sensor'];
           if (key === 'age_entity') el.includeDomains = ['sensor','input_number'];
           if (key === 'birthdate_entity') el.includeDomains = ['sensor','input_text'];
           // Filter für Gramps Birthday Sensoren
-          if (['image_entity','name_entity','age_entity','birthdate_entity'].includes(key)) {
+          if (['picture_entity','name_entity','age_entity','birthdate_entity'].includes(key)) {
             el.entityFilter = (entityId) => entityId?.startsWith('sensor.next_birthday_');
           }
           el.addEventListener('value-changed', (ev) => this._updateEntity(idx, key, ev.detail.value), { once: true });
