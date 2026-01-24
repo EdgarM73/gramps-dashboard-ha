@@ -327,6 +327,10 @@ class GrampsDashboardCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement('gramps-dashboard-editor');
   }
+
+  getConfigElement() {
+    return GrampsDashboardCard.getConfigElement();
+  }
 }
 
 customElements.define('gramps-dashboard-card', GrampsDashboardCard);
@@ -411,21 +415,21 @@ class GrampsDashboardEditor extends HTMLElement {
         <div class="row">
           <label>
             Bild-Entität
-            <input id="image_entity" type="text" value="${this._config.image_entity}" placeholder="image.xyz" />
+            <ha-entity-picker id="image_entity"></ha-entity-picker>
           </label>
           <label>
             Namens-Entität
-            <input id="name_entity" type="text" value="${this._config.name_entity}" placeholder="input_text.xyz_name" />
+            <ha-entity-picker id="name_entity"></ha-entity-picker>
           </label>
         </div>
         <div class="row">
           <label>
             Alters-Entität
-            <input id="age_entity" type="text" value="${this._config.age_entity}" placeholder="input_number.xyz_age" />
+            <ha-entity-picker id="age_entity"></ha-entity-picker>
           </label>
           <label>
             Geburtsdatum-Entität
-            <input id="birthdate_entity" type="text" value="${this._config.birthdate_entity}" placeholder="input_text.xyz_birthdate" />
+            <ha-entity-picker id="birthdate_entity"></ha-entity-picker>
           </label>
         </div>
       </fieldset>
@@ -442,23 +446,23 @@ class GrampsDashboardEditor extends HTMLElement {
                 </label>
                 <label>
                   Bild-Entität (optional)
-                  <input class="image_entity" type="text" value="${e.image_entity || ''}" />
+                  <ha-entity-picker class="image_entity"></ha-entity-picker>
                 </label>
               </div>
               <div class="row">
                 <label>
                   Namens-Entität (optional)
-                  <input class="name_entity" type="text" value="${e.name_entity || ''}" />
+                  <ha-entity-picker class="name_entity"></ha-entity-picker>
                 </label>
                 <label>
                   Alters-Entität (optional)
-                  <input class="age_entity" type="text" value="${e.age_entity || ''}" />
+                  <ha-entity-picker class="age_entity"></ha-entity-picker>
                 </label>
               </div>
               <div class="row">
                 <label>
                   Geburtsdatum-Entität (optional)
-                  <input class="birthdate_entity" type="text" value="${e.birthdate_entity || ''}" />
+                  <ha-entity-picker class="birthdate_entity"></ha-entity-picker>
                 </label>
                 <div class="actions" style="align-items:end;">
                   <button class="remove" data-index="${idx}">Entfernen</button>
@@ -480,20 +484,33 @@ class GrampsDashboardEditor extends HTMLElement {
     this.shadowRoot.getElementById('title').addEventListener('input', (e) => this._updateValue('title', e.target.value));
     this.shadowRoot.getElementById('theme').addEventListener('change', (e) => this._updateValue('theme', e.target.value));
     this.shadowRoot.getElementById('show_header').addEventListener('change', (e) => this._updateValue('show_header', e.target.checked));
-    this.shadowRoot.getElementById('image_entity').addEventListener('input', (e) => this._updateValue('image_entity', e.target.value));
-    this.shadowRoot.getElementById('name_entity').addEventListener('input', (e) => this._updateValue('name_entity', e.target.value));
-    this.shadowRoot.getElementById('age_entity').addEventListener('input', (e) => this._updateValue('age_entity', e.target.value));
-    this.shadowRoot.getElementById('birthdate_entity').addEventListener('input', (e) => this._updateValue('birthdate_entity', e.target.value));
+    const globalPickers = ['image_entity','name_entity','age_entity','birthdate_entity'];
+    globalPickers.forEach((id) => {
+      const el = this.shadowRoot.getElementById(id);
+      if (el) {
+        el.hass = this._hass;
+        el.value = this._config[id] || '';
+        el.addEventListener('value-changed', (ev) => this._updateValue(id, ev.detail.value));
+      }
+    });
 
     // Entities inputs
     const entitiesContainer = this.shadowRoot.getElementById('entities');
     entitiesContainer.querySelectorAll('.entity-card').forEach((card) => {
       const idx = parseInt(card.dataset.index, 10);
       card.querySelector('.entity').addEventListener('input', (e) => this._updateEntity(idx, 'entity', e.target.value));
-      card.querySelector('.image_entity').addEventListener('input', (e) => this._updateEntity(idx, 'image_entity', e.target.value));
-      card.querySelector('.name_entity').addEventListener('input', (e) => this._updateEntity(idx, 'name_entity', e.target.value));
-      card.querySelector('.age_entity').addEventListener('input', (e) => this._updateEntity(idx, 'age_entity', e.target.value));
-      card.querySelector('.birthdate_entity').addEventListener('input', (e) => this._updateEntity(idx, 'birthdate_entity', e.target.value));
+      const imgPicker = card.querySelector('.image_entity');
+      const namePicker = card.querySelector('.name_entity');
+      const agePicker = card.querySelector('.age_entity');
+      const birthPicker = card.querySelector('.birthdate_entity');
+      [imgPicker, namePicker, agePicker, birthPicker].forEach((el, i) => {
+        if (el) {
+          el.hass = this._hass;
+          const key = ['image_entity','name_entity','age_entity','birthdate_entity'][i];
+          el.value = this._config.entities[idx][key] || '';
+          el.addEventListener('value-changed', (ev) => this._updateEntity(idx, key, ev.detail.value));
+        }
+      });
       card.querySelector('.remove').addEventListener('click', () => this._removeEntity(idx));
     });
 
