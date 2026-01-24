@@ -507,13 +507,21 @@ class GrampsDashboardEditor extends HTMLElement {
           `).join('')}
         </div>
         <div class="actions" style="margin-top:8px;">
-          <button id="add">Person hinzufügen</button>
+          <label style="flex: 1;">
+            Person hinzufügen
+            <select id="person-selector" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2);">
+              <option value="">-- Wähle eine Person --</option>
+            </select>
+          </label>
         </div>
       </fieldset>
     `;
 
     this.shadowRoot.innerHTML = '';
     this.shadowRoot.appendChild(editor);
+
+    // Populate person selector
+    this._populatePersonSelector();
 
     // General inputs
     const titleEl = this.shadowRoot.getElementById('title');
@@ -523,9 +531,70 @@ class GrampsDashboardEditor extends HTMLElement {
     if (themeEl) themeEl.addEventListener('change', (e) => this._updateValue('theme', e.target.value));
     if (headerEl) headerEl.addEventListener('change', (e) => this._updateValue('show_header', e.target.checked));
 
-    // Add entity button
-    const addBtn = this.shadowRoot.getElementById('add');
-    if (addBtn) addBtn.addEventListener('click', () => this._addEntity());
+    // Person selector
+    const personSelector = this.shadowRoot.getElementById('person-selector');
+    if (personSelector) {
+      personSelector.addEventListener('change', (e) => {
+        if (e.target.value) {
+          this._addPersonByNumber(e.target.value);
+          e.target.value = ''; // Reset selector
+        }
+      });
+    }
+  }
+
+  _populatePersonSelector() {
+    if (!this._hass) return;
+
+    const selector = this.shadowRoot.getElementById('person-selector');
+    if (!selector) return;
+
+    // Find all next_birthday_*_name sensors
+    const nameSensors = Object.keys(this._hass.states)
+      .filter(entityId => entityId.match(/^sensor\.next_birthday_(\d+)_name$/))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)[0]);
+        const numB = parseInt(b.match(/\d+/)[0]);
+        return numA - numB;
+      });
+
+    // Clear existing options except first
+    selector.innerHTML = '<option value="">-- Wähle eine Person --</option>';
+
+    // Add option for each person
+    nameSensors.forEach(entityId => {
+      const match = entityId.match(/^sensor\.next_birthday_(\d+)_name$/);
+      if (match) {
+        const number = match[1];
+        const state = this._hass.states[entityId];
+        const name = state?.state || `Person ${number}`;
+        
+        // Check if already added
+        const alreadyAdded = this._config.entities.some(e => 
+          e.name_entity === entityId
+        );
+
+        if (!alreadyAdded) {
+          const option = document.createElement('option');
+          option.value = number;
+          option.textContent = `${number} - ${name}`;
+          selector.appendChild(option);
+        }
+      }
+    });
+  }
+
+  _addPersonByNumber(number) {
+    this._config.entities = this._config.entities || [];
+    this._config.entities.push({
+      name_entity: `sensor.next_birthday_${number}_name`,
+      age_entity: `sensor.next_birthday_${number}_age`,
+      birthdate_entity: `sensor.next_birthday_${number}_date`,
+      picture_entity: `sensor.next_birthday_${number}_image`
+    });
+    this.render();
+    this._updatePickers();
+    this._fireConfigChanged();
   }
 
   _updatePickers() {
@@ -607,14 +676,6 @@ class GrampsDashboardEditor extends HTMLElement {
   _updateEntity(index, key, value) {
     if (!this._config.entities[index]) return;
     this._config.entities[index][key] = value;
-    this._fireConfigChanged();
-  }
-
-  _addEntity() {
-    this._config.entities = this._config.entities || [];
-    this._config.entities.push({ entity: '' });
-    this.render();
-    this._updatePickers();
     this._fireConfigChanged();
   }
 
