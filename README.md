@@ -103,6 +103,8 @@ Jede Person wird als Button angezeigt:
 - **Oben links**: Profilbild der Person
 - **Oben rechts**: Name der Person
 - **Unten**: Alter und Geburtsdatum in separaten Details
+ 
+Hinweis: Das Geburtsdatum wird im Format `dd.mm.yyyy` angezeigt.
 
 ## Support
 

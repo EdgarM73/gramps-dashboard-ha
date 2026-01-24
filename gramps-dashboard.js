@@ -237,7 +237,9 @@ class GrampsDashboardCard extends HTMLElement {
     const name = nameEntity_obj.state || 'Unbekannt';
     const imageUrl = imageEntity_obj?.attributes?.entity_picture || null;
     const age = ageEntity_obj?.state || 'N/A';
-    const birthdate = birthdateEntity_obj?.state || 'N/A';
+    const birthdate = birthdateEntity_obj?.state 
+      ? this.formatDateGerman(birthdateEntity_obj.state) 
+      : 'N/A';
 
     button.innerHTML = `
       <div class="person-image">
@@ -264,6 +266,33 @@ class GrampsDashboardCard extends HTMLElement {
     });
 
     return button;
+  }
+
+  formatDateGerman(dateStr) {
+    if (!dateStr) return 'N/A';
+
+    // ISO 8601 (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ssZ)
+    const isoMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr);
+    if (isoMatch) {
+      const [, y, m, d] = isoMatch;
+      return `${d}.${m}.${y}`;
+    }
+
+    // Already dd.mm.yyyy
+    const deMatch = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(dateStr);
+    if (deMatch) return dateStr;
+
+    // Fallback: Date parser
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      const dd = String(parsed.getDate()).padStart(2, '0');
+      const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+      const yyyy = parsed.getFullYear();
+      return `${dd}.${mm}.${yyyy}`;
+    }
+
+    // If parsing failed, return original
+    return dateStr;
   }
 
   fireEvent(type, detail) {
