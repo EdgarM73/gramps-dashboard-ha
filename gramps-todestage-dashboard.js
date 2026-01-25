@@ -129,15 +129,14 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
             ${this.localize('title')}
             <input id="title" type="text" value="${this._config.title || ''}" placeholder="${this.localize('anniversaries')}" />
           </label>
-          <label>
-            ${this.localize('theme')}
-            <select id="theme" value="${this._config.theme}">
-              <option value="default" ${this._config.theme === 'default' ? 'selected' : ''}>${this.localize('default')}</option>
+            .card-content {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
               <option value="dark" ${this._config.theme === 'dark' ? 'selected' : ''}>${this.localize('dark')}</option>
             </select>
-          </label>
-        </div>
-        <label class="full" style="margin-top:8px;">
+              display: flex;
+              align-items: center;
           <input id="show_header" type="checkbox" ${this._config.show_header ? 'checked' : ''} /> ${this.localize('show_header')}
         </label>
       </fieldset>
