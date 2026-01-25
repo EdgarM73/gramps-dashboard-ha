@@ -81,8 +81,8 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       title: config?.title || '',
       show_header: config?.show_header !== false,
       theme: config?.theme || 'default',
-      image_entity_1: config?.image_entity_1 || config?.picture_entity_1 || '',      
-      picture_entity_1: config?.picture_entity_1 || config?.image_entity_1 || '',      
+      image_entity: config?.image_entity || config?.picture_entity || '',      
+      picture_entity: config?.picture_entity || config?.image_entity || '',      
       name_entity: config?.name_entity || '',
       age_entity: config?.age_entity || '',
       deathdate_entity: config?.deathdate_entity || '',
@@ -161,7 +161,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
               <div style="display: flex; gap: 8px;">
                 <label style="flex:1;">
                   Bild 1 Entity
-                  <input type="text" value="${e.picture_entity_1 || ''}" data-idx="${idx}" data-key="picture_entity_1" placeholder="sensor.next_deathday_${personId}_image_1" />
+                  <input type="text" value="${e.picture_entity || ''}" data-idx="${idx}" data-key="picture_entity" placeholder="sensor.next_deathday_${personId}_image" />
                 </label>
           
               </div>
@@ -276,7 +276,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       name_entity: `sensor.next_deathday_${number}_name`,
       age_entity: `sensor.next_deathday_${number}_age`,
       deathdate_entity: `sensor.next_deathday_${number}_date`,
-      picture_entity_1: `sensor.next_deathday_${number}_image_1`
+      picture_entity: `sensor.next_deathday_${number}_image`
     });
     this._updateEntityList();
     this._populatePersonSelector();
@@ -303,7 +303,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
             name_entity: `sensor.next_deathday_${number}_name`,
             age_entity: `sensor.next_deathday_${number}_age`,
             deathdate_entity: `sensor.next_deathday_${number}_date`,
-            picture_entity_1: `sensor.next_deathday_${number}_image_1`
+            picture_entity: `sensor.next_deathday_${number}_image`
           });
           addedCount++;
         }
@@ -335,7 +335,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
           <div style="display: flex; gap: 8px;">
             <label style="flex:1;">
               Bild 1 Entity
-              <input type="text" value="${e.picture_entity_1 || ''}" data-idx="${idx}" data-key="picture_entity_1" placeholder="sensor.next_deathday_${personId}_image_1" />
+              <input type="text" value="${e.picture_entity || ''}" data-idx="${idx}" data-key="picture_entity" placeholder="sensor.next_deathday_${personId}_image" />
             </label>
             
           </div>
@@ -588,8 +588,8 @@ class GrampsTodestageDashboardCard extends HTMLElement {
   }
 
   createPersonButton(config) {
-    // Nur ein Bild für Todestage, aber YAML und Editor nutzen meist picture_entity_1
-    const imageEntity = config.picture_entity_1 || config.image_entity_1 || config.picture_entity || config.image_entity || this.config.picture_entity_1 || this.config.image_entity_1 || this.config.picture_entity || this.config.image_entity;
+    // Nur ein Bild für Todestage, aber YAML und Editor nutzen meist picture_entity
+    const imageEntity = config.picture_entity || config.image_entity || config.picture_entity || config.image_entity || this.config.picture_entity|| this.config.image_entity || this.config.picture_entity || this.config.image_entity;
     const nameEntity = config.name_entity || this.config.name_entity;
     const ageEntity = config.age_entity || this.config.age_entity;
     const deathdateEntity = config.deathdate_entity || this.config.deathdate_entity;
@@ -682,7 +682,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
           name_entity: 'sensor.next_deathday_1_name',
           age_entity: 'sensor.next_deathday_1_age',
           deathdate_entity: 'sensor.next_deathday_1_date',
-          picture_entity_1: 'sensor.next_deathday_1_image'
+          picture_entity: 'sensor.next_deathday_1_image'
         }
       ],
       theme: 'default',
