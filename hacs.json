@@ -1,8 +1,9 @@
 {
   "name": "Gramps Dashboard",
   "content_in_root": false,
-  "filename": "gramps-dashboard.js",
-  "extra": [    
+  "filename": "gramps-dashboard-collection.js",
+  "extra": [
+    "gramps-dashboard.js",
     "gramps-todestage-dashboard.js",
     "gramps-anniversaries-dashboard.js"
   ],
