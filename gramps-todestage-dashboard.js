@@ -452,13 +452,12 @@ class GrampsTodestageDashboardCard extends HTMLElement {
           margin-bottom: 16px;
         }
         .card-content {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
         }
         .person-button {
-          display: grid;
-          grid-template-columns: 1fr 1fr 2fr;
+          display: flex;
           align-items: center;
           background: var(--card-background-color, #fff);
           border: 1px solid var(--divider-color, #e0e0e0);
@@ -525,22 +524,10 @@ class GrampsTodestageDashboardCard extends HTMLElement {
           background: rgba(255, 255, 255, 0.05);
         }
         @media (max-width: 1200px) {
-          .card-content {
-            grid-template-columns: repeat(3, 1fr);
-          }
-          .person-button {
-            grid-column: span 3;
-          }
+          /* Keine Änderung nötig, da flex-column */
         }
         @media (max-width: 768px) {
-          .card-content {
-            grid-template-columns: 1fr;
-          }
-          .person-button {
-            grid-column: span 1;
-            grid-row: span 1;
-            grid-template-columns: 1fr 1fr 2fr;
-          }
+          /* Keine Änderung nötig, da flex-column */
         }
       </style>
       ${this.config.show_header ? `<div class="card-header">${this.config.title || this.localize('anniversaries')}</div>` : ''}
