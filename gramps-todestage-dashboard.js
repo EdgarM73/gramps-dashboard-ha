@@ -682,7 +682,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
           name_entity: 'sensor.next_deathday_1_name',
           age_entity: 'sensor.next_deathday_1_age',
           deathdate_entity: 'sensor.next_deathday_1_date',
-          picture_entity_1: 'sensor.next_deathday_1_image_person_1'
+          picture_entity_1: 'sensor.next_deathday_1_image'
         }
       ],
       theme: 'default',
