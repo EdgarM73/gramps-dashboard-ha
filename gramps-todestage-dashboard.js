@@ -117,101 +117,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       .actions { display: flex; gap: 8px; }
       button { padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; }
     `;
-
-    const editor = document.createElement('div');
-    editor.className = 'editor';
-    editor.innerHTML = `
-      <style>${styles}</style>
-      <fieldset class="full">
-        <legend>${this.localize('general')}</legend>
-        <div class="row">
-          <label>
-            ${this.localize('title')}
-            <input id="title" type="text" value="${this._config.title || ''}" placeholder="${this.localize('anniversaries')}" />
-          </label>
-            .card-content {
-              display: flex;
-              flex-direction: column;
-              gap: 16px;
-              <option value="dark" ${this._config.theme === 'dark' ? 'selected' : ''}>${this.localize('dark')}</option>
-            </select>
-              display: flex;
-              align-items: center;
-          <input id="show_header" type="checkbox" ${this._config.show_header ? 'checked' : ''} /> ${this.localize('show_header')}
-        </label>
-      </fieldset>
-
-      <fieldset class="full">
-        <legend>${this.localize('persons')}</legend>
-        <div class="entities" id="entities">
-          ${this._config.entities.map((e, idx) => {
-            const nameEntity = e.name_entity || '';
-            const match = nameEntity.match(/next_deathday_(\d+)_name/);
-            const personId = match ? match[1] : idx + 1;
-            const personName = this._hass?.states[nameEntity]?.state || this.localize('unknown');
-            return `
-            <div class="entity-card" data-index="${idx}" style="display: flex; flex-direction: column; gap: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="flex: 1;">
-                  <strong>${this.localize('person')} ${personId}</strong> - ${personName}
-                </div>
-                <button class="remove" data-index="${idx}" style="margin-left: 12px;">${this.localize('remove')}</button>
-              </div>
-              <div style="display: flex; gap: 8px;">
-                <label style="flex:1;">
-                  Bild 1 Entity
-                  <input type="text" value="${e.picture_entity || ''}" data-idx="${idx}" data-key="picture_entity" placeholder="sensor.next_deathday_${personId}_image" />
-                </label>
-          
-              </div>
-            </div>
-          `;
-          }).join('')}
-        </div>
-        <div class="actions" style="margin-top:8px; display: flex; gap: 8px;">
-          <label style="flex: 1;">
-            ${this.localize('add_person')}
-            <select id="person-selector" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2);">
-              <option value="">${this.localize('select_person')}</option>
-            </select>
-          </label>
-          <button id="add-all-btn" style="padding: 8px 16px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; background: var(--primary-color, #03A9F4); color: white; font-weight: 600; height: 42px; margin-top: 24px;">${this.localize('add_all')}</button>
-        </div>
-      </fieldset>
-    `;
-
-    this.shadowRoot.innerHTML = '';
-    this.shadowRoot.appendChild(editor);
-
-    this._populatePersonSelector();
-
-    const titleEl = this.shadowRoot.getElementById('title');
-    const themeEl = this.shadowRoot.getElementById('theme');
-    const headerEl = this.shadowRoot.getElementById('show_header');
-    if (titleEl) {
-      titleEl.addEventListener('input', (e) => {
-        this._updateValue('title', e.target.value);
-      });
-    }
-    if (themeEl) {
-      themeEl.addEventListener('change', (e) => {
-        this._updateValue('theme', e.target.value);
-      });
-    }
-    if (headerEl) {
-      headerEl.addEventListener('change', (e) => {
-        this._updateValue('show_header', e.target.checked);
-      });
-    }
-
-    const personSelector = this.shadowRoot.getElementById('person-selector');
-    if (personSelector) {
-      personSelector.addEventListener('change', (e) => {
-        if (e.target.value) {
-          this._addPersonByNumber(e.target.value);
-          e.target.value = '';
-        }
-      });
+    // ...existing code...
     }
 
     const addAllBtn = this.shadowRoot.getElementById('add-all-btn');
@@ -419,86 +325,96 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this._hass = null;
     this.config = {};
-  }
-
-  set hass(hass) {
-    this._hass = hass;
-    this.updateContent();
-  }
-
-  setConfig(config) {
-    this.config = config;
-    this.render();
-    this.updateContent();
-  }
-
-  localize(key) {
-    const lang = this._hass?.locale?.language || this._hass?.language || 'de';
-    const langCode = lang.split('-')[0];
-    return TRANSLATIONS[langCode]?.[key] || TRANSLATIONS['de'][key] || key;
-  }
-
   render() {
     const card = document.createElement('div');
     card.className = 'todestage-card';
     card.innerHTML = `
       <style>
+        :host {
+          --gramps-primary-color: var(--primary-color, #03a9f4);
+          --gramps-accent-color: var(--accent-color, #ff9800);
+          --gramps-card-background: var(--card-background-color, #fff);
+          --gramps-text-primary: var(--primary-text-color, #212121);
+          --gramps-text-secondary: var(--secondary-text-color, #727272);
+        }
         .card-header {
-          font-size: 22px;
-          font-weight: 700;
-          padding: 16px 0 8px 0;
-          border-bottom: 1px solid var(--divider-color, #e0e0e0);
-          margin-bottom: 16px;
+          padding: 16px;
+          font-size: 20px;
+          font-weight: 500;
+          color: var(--gramps-text-primary);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
         .card-content {
-          display: flex;
-          flex-direction: column;
+          padding: 16px;
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
           gap: 16px;
+          grid-auto-rows: auto;
         }
         .person-button {
-          display: flex;
-          align-items: center;
-          background: var(--card-background-color, #fff);
-          border: 1px solid var(--divider-color, #e0e0e0);
-          border-radius: 12px;
+          grid-column: span 6;
+          grid-row: span 3;
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          grid-template-rows: auto auto;
+          gap: 12px;
           padding: 16px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+          background: var(--gramps-card-background);
+          border-radius: 12px;
+          border: 2px solid rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
           cursor: pointer;
-          transition: box-shadow 0.2s;
+          overflow: hidden;
         }
         .person-button:hover {
-          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          transform: translateY(-4px);
+          border-color: var(--gramps-primary-color);
         }
         .person-image {
-          width: 64px;
-          height: 64px;
-          border-radius: 50%;
-          background: #f0f0f0;
+          grid-column: 1;
+          grid-row: 1 / span 2;
+          width: 100%;
+          aspect-ratio: 1;
+          border-radius: 8px;
+          overflow: hidden;
+          background: rgba(0, 0, 0, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          overflow: hidden;
-          margin-right: 8px;
         }
         .person-image img {
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
-        .person-details {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
+        .person-image ha-icon {
+          width: 48px;
+          height: 48px;
+          color: var(--gramps-text-secondary);
         }
         .person-name {
-          font-size: 18px;
-          font-weight: 600;
-          margin-bottom: 4px;
+          grid-column: 2;
+          grid-row: 1;
+          display: flex;
+          align-items: center;
+          font-size: 24px;
+          font-weight: 700;
+          color: var(--gramps-text-primary);
+          word-break: break-word;
+        }
+        .person-details {
+          grid-column: 2;
+          grid-row: 2;
+          display: flex;
+          gap: 24px;
+          align-items: center;
+          flex-wrap: wrap;
         }
         .detail-item {
           display: flex;
-          align-items: center;
-          gap: 8px;
+          flex-direction: column;
+          gap: 4px;
         }
         .detail-label {
           font-size: 12px;
@@ -523,10 +439,22 @@ class GrampsTodestageDashboardCard extends HTMLElement {
           background: rgba(255, 255, 255, 0.05);
         }
         @media (max-width: 1200px) {
-          /* Keine Änderung nötig, da flex-column */
+          .card-content {
+            grid-template-columns: repeat(3, 1fr);
+          }
+          .person-button {
+            grid-column: span 3;
+          }
         }
         @media (max-width: 768px) {
-          /* Keine Änderung nötig, da flex-column */
+          .card-content {
+            grid-template-columns: 1fr;
+          }
+          .person-button {
+            grid-column: span 1;
+            grid-row: span 1;
+            grid-template-columns: 1fr 2fr;
+          }
         }
       </style>
       ${this.config.show_header ? `<div class="card-header">${this.config.title || this.localize('anniversaries')}</div>` : ''}
@@ -534,48 +462,6 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     `;
     this.shadowRoot.innerHTML = '';
     this.shadowRoot.appendChild(card);
-  }
-
-  updateContent() {
-    if (!this._hass) return;
-    const container = this.shadowRoot.getElementById('entities-container');
-    if (!container) return;
-    container.innerHTML = '';
-    let hasValidEntities = false;
-    this.config.entities.forEach((entityConf, index) => {
-      const config = typeof entityConf === 'string' ? { entity: entityConf } : entityConf;
-      const button = this.createPersonButton(config);
-      if (button) {
-        container.appendChild(button);
-        hasValidEntities = true;
-      }
-    });
-    if (!hasValidEntities && this.config.entities.length > 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1 / -1; padding: 32px; text-align: center; color: var(--gramps-text-secondary);">
-          <ha-icon icon="mdi:alert-circle-outline" style="width: 48px; height: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></ha-icon>
-          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Keine Entitaeten gefunden</div>
-          <div style="font-size: 14px; line-height: 1.5;">
-            Die konfigurierten Entitaeten existieren nicht in Home Assistant.<br>
-            Bitte erstelle die Entitaeten oder bearbeite die Karte im visuellen Editor.
-          </div>
-        </div>
-      `;
-    } else if (this.config.entities.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1 / -1; padding: 32px; text-align: center; color: var(--gramps-text-secondary);">
-          <ha-icon icon="mdi:account-group-outline" style="width: 48px; height: 48px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;"></ha-icon>
-          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${this.localize('no_entities')}</div>
-          <div style="font-size: 14px; line-height: 1.5;">
-            Bearbeite diese Karte und fuege Personen hinzu.
-          </div>
-        </div>`;
-    }
-  }
-
-  createPersonButton(config) {
-    // Nur ein Bild für Todestage, aber YAML und Editor nutzen meist picture_entity
-    const imageEntity = config.picture_entity || config.image_entity || config.picture_entity || config.image_entity || this.config.picture_entity|| this.config.image_entity || this.config.picture_entity || this.config.image_entity;
     const nameEntity = config.name_entity || this.config.name_entity;
     const ageEntity = config.age_entity || this.config.age_entity;
     const deathdateEntity = config.deathdate_entity || this.config.deathdate_entity;
