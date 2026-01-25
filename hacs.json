@@ -3,7 +3,8 @@
   "content_in_root": false,
   "filename": "gramps-dashboard.js",
   "extra": [
-    "gramps-todestage-dashboard.js"
+    "gramps-todestage-dashboard.js",
+    "gramps-anniversaries-dashboard.js"
   ],
   "country": ["DE"],
   "render_readme": true,
