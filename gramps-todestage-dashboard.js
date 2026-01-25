@@ -2,7 +2,7 @@ const TRANSLATIONS = {
   de: {
     anniversaries: 'Todestage',
     years: 'Jahre',
-    anniversary: 'Todestag',
+    deathday: 'Todestag',
     no_entities: 'Keine Personen konfiguriert',
     title: 'Titel',
     theme: 'Theme',
@@ -21,7 +21,7 @@ const TRANSLATIONS = {
   en: {
     anniversaries: 'Anniversaries',
     years: 'years',
-    anniversary: 'Anniversary',
+    deathday: 'deathday',
     no_entities: 'No persons configured',
     title: 'Title',
     theme: 'Theme',
@@ -40,7 +40,7 @@ const TRANSLATIONS = {
   fr: {
     anniversaries: 'Anniversaires',
     years: 'ans',
-    anniversary: 'Anniversaire',
+    deathday: 'Anniversaire',
     no_entities: 'Aucune personne configuree',
     title: 'Titre',
     theme: 'Theme',
@@ -81,10 +81,8 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       title: config?.title || '',
       show_header: config?.show_header !== false,
       theme: config?.theme || 'default',
-      image_entity_1: config?.image_entity_1 || config?.picture_entity_1 || '',
-      image_entity_2: config?.image_entity_2 || config?.picture_entity_2 || '',
-      picture_entity_1: config?.picture_entity_1 || config?.image_entity_1 || '',
-      picture_entity_2: config?.picture_entity_2 || config?.image_entity_2 || '',
+      image_entity_1: config?.image_entity_1 || config?.picture_entity_1 || '',      
+      picture_entity_1: config?.picture_entity_1 || config?.image_entity_1 || '',      
       name_entity: config?.name_entity || '',
       age_entity: config?.age_entity || '',
       deathdate_entity: config?.deathdate_entity || '',
@@ -149,7 +147,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
         <div class="entities" id="entities">
           ${this._config.entities.map((e, idx) => {
             const nameEntity = e.name_entity || '';
-            const match = nameEntity.match(/next_anniversary_(\d+)_name/);
+            const match = nameEntity.match(/next_deathday_(\d+)_name/);
             const personId = match ? match[1] : idx + 1;
             const personName = this._hass?.states[nameEntity]?.state || this.localize('unknown');
             return `
@@ -163,12 +161,9 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
               <div style="display: flex; gap: 8px;">
                 <label style="flex:1;">
                   Bild 1 Entity
-                  <input type="text" value="${e.picture_entity_1 || ''}" data-idx="${idx}" data-key="picture_entity_1" placeholder="sensor.next_anniversary_${personId}_image_1" />
+                  <input type="text" value="${e.picture_entity_1 || ''}" data-idx="${idx}" data-key="picture_entity_1" placeholder="sensor.next_deathday_${personId}_image_1" />
                 </label>
-                <label style="flex:1;">
-                  Bild 2 Entity
-                  <input type="text" value="${e.picture_entity_2 || ''}" data-idx="${idx}" data-key="picture_entity_2" placeholder="sensor.next_anniversary_${personId}_image_2" />
-                </label>
+          
               </div>
             </div>
           `;
@@ -251,7 +246,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
     const selector = this.shadowRoot.getElementById('person-selector');
     if (!selector) return;
     const nameSensors = Object.keys(this._hass.states)
-      .filter(entityId => entityId.match(/^sensor\.next_anniversary_(\d+)_name$/))
+      .filter(entityId => entityId.match(/^sensor\.next_deathday_(\d+)_name$/))
       .sort((a, b) => {
         const numA = parseInt(a.match(/\d+/)[0]);
         const numB = parseInt(b.match(/\d+/)[0]);
@@ -259,7 +254,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       });
     selector.innerHTML = `<option value="">${this.localize('select_person')}</option>`;
     nameSensors.forEach(entityId => {
-      const match = entityId.match(/^sensor\.next_anniversary_(\d+)_name$/);
+      const match = entityId.match(/^sensor\.next_deathday_(\d+)_name$/);
       if (match) {
         const number = match[1];
         const state = this._hass.states[entityId];
@@ -278,11 +273,10 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
   _addPersonByNumber(number) {
     this._config.entities = this._config.entities || [];
     this._config.entities.push({
-      name_entity: `sensor.next_anniversary_${number}_name`,
-      age_entity: `sensor.next_anniversary_${number}_age`,
-      deathdate_entity: `sensor.next_anniversary_${number}_date`,
-      picture_entity_1: `sensor.next_anniversary_${number}_image_1`,
-      picture_entity_2: `sensor.next_anniversary_${number}_image_2`
+      name_entity: `sensor.next_deathday_${number}_name`,
+      age_entity: `sensor.next_deathday_${number}_age`,
+      deathdate_entity: `sensor.next_deathday_${number}_date`,
+      picture_entity_1: `sensor.next_deathday_${number}_image_1`
     });
     this._updateEntityList();
     this._populatePersonSelector();
@@ -292,7 +286,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
   _addAllPersons() {
     if (!this._hass) return;
     const nameSensors = Object.keys(this._hass.states)
-      .filter(entityId => entityId.match(/^sensor\.next_anniversary_(\d+)_name$/))
+      .filter(entityId => entityId.match(/^sensor\.next_deathday_(\d+)_name$/))
       .sort((a, b) => {
         const numA = parseInt(a.match(/\d+/)[0]);
         const numB = parseInt(b.match(/\d+/)[0]);
@@ -300,17 +294,16 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       });
     let addedCount = 0;
     nameSensors.forEach(entityId => {
-      const match = entityId.match(/^sensor\.next_anniversary_(\d+)_name$/);
+      const match = entityId.match(/^sensor\.next_deathday_(\d+)_name$/);
       if (match) {
         const number = match[1];
         const alreadyAdded = this._config.entities.some(e => e.name_entity === entityId);
         if (!alreadyAdded) {
           this._config.entities.push({
-            name_entity: `sensor.next_anniversary_${number}_name`,
-            age_entity: `sensor.next_anniversary_${number}_age`,
-            deathdate_entity: `sensor.next_anniversary_${number}_date`,
-            picture_entity_1: `sensor.next_anniversary_${number}_image_1`,
-            picture_entity_2: `sensor.next_anniversary_${number}_image_2`
+            name_entity: `sensor.next_deathday_${number}_name`,
+            age_entity: `sensor.next_deathday_${number}_age`,
+            deathdate_entity: `sensor.next_deathday_${number}_date`,
+            picture_entity_1: `sensor.next_deathday_${number}_image_1`
           });
           addedCount++;
         }
@@ -328,7 +321,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
     if (!entitiesContainer) return;
     entitiesContainer.innerHTML = this._config.entities.map((e, idx) => {
       const nameEntity = e.name_entity || '';
-      const match = nameEntity.match(/next_anniversary_(\d+)_name/);
+      const match = nameEntity.match(/next_deathday_(\d+)_name/);
       const personId = match ? match[1] : idx + 1;
       const personName = this._hass?.states[nameEntity]?.state || this.localize('unknown');
       return `
@@ -342,12 +335,9 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
           <div style="display: flex; gap: 8px;">
             <label style="flex:1;">
               Bild 1 Entity
-              <input type="text" value="${e.picture_entity_1 || ''}" data-idx="${idx}" data-key="picture_entity_1" placeholder="sensor.next_anniversary_${personId}_image_1" />
+              <input type="text" value="${e.picture_entity_1 || ''}" data-idx="${idx}" data-key="picture_entity_1" placeholder="sensor.next_deathday_${personId}_image_1" />
             </label>
-            <label style="flex:1;">
-              Bild 2 Entity
-              <input type="text" value="${e.picture_entity_2 || ''}" data-idx="${idx}" data-key="picture_entity_2" placeholder="sensor.next_anniversary_${personId}_image_2" />
-            </label>
+            
           </div>
         </div>
       `;
@@ -640,7 +630,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
           <div class="detail-value">${age}</div>
         </div>
         <div class="detail-item">
-          <div class="detail-label">${this.localize('anniversary')}</div>
+          <div class="detail-label">${this.localize('deathday')}</div>
           <div class="detail-value">${deathdate}</div>
         </div>
       </div>
@@ -689,11 +679,10 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     return {
       entities: [
         {
-          name_entity: 'sensor.next_anniversary_1_name',
-          age_entity: 'sensor.next_anniversary_1_age',
-          deathdate_entity: 'sensor.next_anniversary_1_date',
-          picture_entity_1: 'sensor.next_anniversary_1_image_1',
-          picture_entity_2: 'sensor.next_anniversary_1_image_2'
+          name_entity: 'sensor.next_deathday_1_name',
+          age_entity: 'sensor.next_deathday_1_age',
+          deathdate_entity: 'sensor.next_deathday_1_date',
+          picture_entity_1: 'sensor.next_deathday_1_image_person_1'
         }
       ],
       theme: 'default',

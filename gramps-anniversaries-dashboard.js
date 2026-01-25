@@ -371,8 +371,8 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
           name_entity: 'sensor.next_anniversary_1_name',
           age_entity: 'sensor.next_anniversary_1_age',
           anniversary_entity: 'sensor.next_anniversary_1_date',
-          picture_entity_1: 'sensor.next_anniversary_1_image_1',
-          picture_entity_2: 'sensor.next_anniversary_1_image_2'
+          picture_entity_1: 'sensor.next_anniversary_1_image_person_1',
+          picture_entity_2: 'sensor.next_anniversary_1_image_person_2'
         }
       ],
       theme: 'default',
