@@ -352,6 +352,14 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
   }
 }
 
+
 customElements.define('gramps-anniversaries-dashboard-card', GrampsAnniversariesDashboardCard);
 
-// Editor-Klasse und window.customCards-Registrierung können bei Bedarf ergänzt werden.
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'gramps-anniversaries-dashboard-card',
+  name: 'Gramps Anniversaries Dashboard Card',
+  description: 'Ein anpassbares Jahrestage-Dashboard-Template für Home Assistant',
+  preview: true,
+  documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
+});
