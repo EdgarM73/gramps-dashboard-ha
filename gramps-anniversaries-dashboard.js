@@ -1,3 +1,39 @@
+// Editor für Anniversaries Dashboard Card
+class GrampsAnniversariesDashboardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._config = {};
+    this._hass = null;
+  }
+
+  localize(key) {
+    const lang = this._hass?.locale?.language || this._hass?.language || 'de';
+    const langCode = lang.split('-')[0];
+    return TRANSLATIONS[langCode]?.[key] || TRANSLATIONS['de'][key] || key;
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    // Hier könnte man Picker aktualisieren
+  }
+
+  setConfig(config) {
+    this._config = { ...config };
+    this.render();
+  }
+
+  render() {
+    this.shadowRoot.innerHTML = `
+      <div style="padding:16px;">
+        <h3>${this.localize('anniversaries')}</h3>
+        <p>Editor für Jahrestage-Karte (Stub, bitte YAML nutzen)</p>
+      </div>
+    `;
+  }
+}
+
+customElements.define('gramps-anniversaries-dashboard-editor', GrampsAnniversariesDashboardEditor);
 const TRANSLATIONS = {
   de: {
     anniversaries: 'Jahrestage',
