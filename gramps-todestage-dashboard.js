@@ -588,8 +588,8 @@ class GrampsTodestageDashboardCard extends HTMLElement {
   }
 
   createPersonButton(config) {
-    // Only one image for Todestage
-    const imageEntity = config.picture_entity || config.image_entity || this.config.picture_entity || this.config.image_entity;
+    // Nur ein Bild für Todestage, aber YAML und Editor nutzen meist picture_entity_1
+    const imageEntity = config.picture_entity_1 || config.image_entity_1 || config.picture_entity || config.image_entity || this.config.picture_entity_1 || this.config.image_entity_1 || this.config.picture_entity || this.config.image_entity;
     const nameEntity = config.name_entity || this.config.name_entity;
     const ageEntity = config.age_entity || this.config.age_entity;
     const deathdateEntity = config.deathdate_entity || this.config.deathdate_entity;
