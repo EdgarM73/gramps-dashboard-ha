@@ -366,6 +366,11 @@ console.info(
   'color: #03a9f4; background: white; font-weight: 700;',
 );
 class GrampsTodestageDashboardCard extends HTMLElement {
+      // Sicherstellen, dass setConfig als Methode und als Property existiert
+      setConfig = (config) => {
+        this.config = config;
+        this.render();
+      }
     setConfig(config) {
       this.config = config;
       this.render();
