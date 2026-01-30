@@ -366,6 +366,10 @@ console.info(
   'color: #03a9f4; background: white; font-weight: 700;',
 );
 class GrampsTodestageDashboardCard extends HTMLElement {
+    setConfig(config) {
+      this.config = config;
+      this.render();
+    }
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
