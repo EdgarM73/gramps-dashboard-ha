@@ -58,8 +58,7 @@ const TRANSLATIONS = {
   }
 };
 
-  // Editor für Todestage (analog zu Geburtstage)
-  class GrampsTodestageDashboardEditor extends HTMLElement {
+class GrampsTodestageDashboardEditor extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
