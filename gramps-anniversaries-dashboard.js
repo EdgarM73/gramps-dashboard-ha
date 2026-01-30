@@ -15,12 +15,24 @@ class GrampsAnniversariesDashboardEditor extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    // Hier könnte man Picker aktualisieren
+    this._updatePickers();
   }
 
   setConfig(config) {
-    this._config = { ...config };
+    this._config = {
+      title: config?.title || '',
+      show_header: config?.show_header !== false,
+      theme: config?.theme || 'default',
+      name_entity: config?.name_entity || '',
+      age_entity: config?.age_entity || '',
+      anniversary_entity: config?.anniversary_entity || '',
+      picture_entity_1: config?.picture_entity_1 || '',
+      picture_entity_2: config?.picture_entity_2 || '',
+      entities: Array.isArray(config?.entities) ? JSON.parse(JSON.stringify(config.entities)) : [],
+    };
     this.render();
+    this._setupEventListeners();
+    this._updatePickers();
   }
 
   render() {
@@ -90,7 +102,207 @@ class GrampsAnniversariesDashboardEditor extends HTMLElement {
     `;
     this.shadowRoot.innerHTML = '';
     this.shadowRoot.appendChild(editor);
-    // You should implement _populatePersonSelector, _updateEntityList, and event listeners as in the other editors.
+    this._populatePersonSelector();
+    this._updateEntityList();
+  }
+
+  _populatePersonSelector() {
+    if (!this._hass) return;
+    const selector = this.shadowRoot.getElementById('person-selector');
+    if (!selector) return;
+    const nameSensors = Object.keys(this._hass.states)
+      .filter(entityId => entityId.match(/^sensor\.next_anniversary_(\d+)_name$/))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)[0]);
+        const numB = parseInt(b.match(/\d+/)[0]);
+        return numA - numB;
+      });
+    selector.innerHTML = `<option value="">${this.localize('select_person')}</option>`;
+    nameSensors.forEach(entityId => {
+      const match = entityId.match(/^sensor\.next_anniversary_(\d+)_name$/);
+      if (match) {
+        const number = match[1];
+        const state = this._hass.states[entityId];
+        const name = state?.state || `Person ${number}`;
+        const alreadyAdded = this._config.entities.some(e => e.name_entity === entityId);
+        if (!alreadyAdded) {
+          const option = document.createElement('option');
+          option.value = number;
+          option.textContent = `${number} - ${name}`;
+          selector.appendChild(option);
+        }
+      }
+    });
+  }
+
+  _addPersonByNumber(number) {
+    this._config.entities = this._config.entities || [];
+    this._config.entities.push({
+      name_entity: `sensor.next_anniversary_${number}_name`,
+      age_entity: `sensor.next_anniversary_${number}_age`,
+      anniversary_entity: `sensor.next_anniversary_${number}_date`,
+      picture_entity_1: `sensor.next_anniversary_${number}_image_person_1`,
+      picture_entity_2: `sensor.next_anniversary_${number}_image_person_2`
+    });
+    this._updateEntityList();
+    this._populatePersonSelector();
+    this._fireConfigChanged();
+  }
+
+  _addAllPersons() {
+    if (!this._hass) return;
+    const nameSensors = Object.keys(this._hass.states)
+      .filter(entityId => entityId.match(/^sensor\.next_anniversary_(\d+)_name$/))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)[0]);
+        const numB = parseInt(b.match(/\d+/)[0]);
+        return numA - numB;
+      });
+    let addedCount = 0;
+    nameSensors.forEach(entityId => {
+      const match = entityId.match(/^sensor\.next_anniversary_(\d+)_name$/);
+      if (match) {
+        const number = match[1];
+        const alreadyAdded = this._config.entities.some(e => e.name_entity === entityId);
+        if (!alreadyAdded) {
+          this._config.entities.push({
+            name_entity: `sensor.next_anniversary_${number}_name`,
+            age_entity: `sensor.next_anniversary_${number}_age`,
+            anniversary_entity: `sensor.next_anniversary_${number}_date`,
+            picture_entity_1: `sensor.next_anniversary_${number}_image_person_1`,
+            picture_entity_2: `sensor.next_anniversary_${number}_image_person_2`
+          });
+          addedCount++;
+        }
+      }
+    });
+    if (addedCount > 0) {
+      this._updateEntityList();
+      this._populatePersonSelector();
+      this._fireConfigChanged();
+    }
+  }
+
+  _updateEntityList() {
+    const entitiesContainer = this.shadowRoot?.getElementById('entities');
+    if (!entitiesContainer) return;
+    entitiesContainer.innerHTML = this._config.entities.map((e, idx) => {
+      const nameEntity = e.name_entity || '';
+      const match = nameEntity.match(/next_anniversary_(\d+)_name/);
+      const personId = match ? match[1] : idx + 1;
+      const personName = this._hass?.states[nameEntity]?.state || this.localize('unknown');
+      return `
+        <div class="entity-card" data-index="${idx}" style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+              <strong>${this.localize('person')} ${personId}</strong> - ${personName}
+            </div>
+            <button class="remove" data-index="${idx}" style="margin-left: 12px;">${this.localize('remove')}</button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <label style="flex:1;">
+              Bild 1 Entity
+              <input type="text" value="${e.picture_entity_1 || ''}" data-idx="${idx}" data-key="picture_entity_1" placeholder="sensor.next_anniversary_${personId}_image_person_1" />
+            </label>
+            <label style="flex:1;">
+              Bild 2 Entity
+              <input type="text" value="${e.picture_entity_2 || ''}" data-idx="${idx}" data-key="picture_entity_2" placeholder="sensor.next_anniversary_${personId}_image_person_2" />
+            </label>
+          </div>
+        </div>
+      `;
+    }).join('');
+    const removeButtons = this.shadowRoot.querySelectorAll('.remove');
+    removeButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.index, 10);
+        this._removeEntity(idx);
+      });
+    });
+    // Listen for image entity input changes
+    const imageInputs = this.shadowRoot.querySelectorAll('input[data-key]');
+    imageInputs.forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.idx, 10);
+        const key = e.target.dataset.key;
+        this._updateEntity(idx, key, e.target.value);
+      });
+    });
+  }
+
+  _setupEventListeners() {
+    const titleEl = this.shadowRoot.getElementById('title');
+    const themeEl = this.shadowRoot.getElementById('theme');
+    const headerEl = this.shadowRoot.getElementById('show_header');
+    if (titleEl) {
+      titleEl.addEventListener('input', (e) => {
+        this._updateValue('title', e.target.value);
+      });
+    }
+    if (themeEl) {
+      themeEl.addEventListener('change', (e) => {
+        this._updateValue('theme', e.target.value);
+      });
+    }
+    if (headerEl) {
+      headerEl.addEventListener('change', (e) => {
+        this._updateValue('show_header', e.target.checked);
+      });
+    }
+
+    const personSelector = this.shadowRoot.getElementById('person-selector');
+    if (personSelector) {
+      personSelector.addEventListener('change', (e) => {
+        if (e.target.value) {
+          this._addPersonByNumber(e.target.value);
+          e.target.value = '';
+        }
+      });
+    }
+
+    const addAllBtn = this.shadowRoot.getElementById('add-all-btn');
+    if (addAllBtn) {
+      addAllBtn.addEventListener('click', () => {
+        this._addAllPersons();
+      });
+    }
+  }
+
+  _updatePickers() {
+    if (!this._hass || !this.shadowRoot) return;
+    const entitiesContainer = this.shadowRoot.getElementById('entities');
+    if (!entitiesContainer) return;
+    entitiesContainer.querySelectorAll('.entity-card').forEach((card) => {
+      const idx = parseInt(card.dataset.index, 10);
+      const removeBtn = card.querySelector('.remove');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', () => this._removeEntity(idx), { once: true });
+      }
+    });
+  }
+
+  _updateValue(key, value) {
+    this._config[key] = value;
+    this._fireConfigChanged();
+  }
+
+  _updateEntity(index, key, value) {
+    if (!this._config.entities[index]) return;
+    this._config.entities[index][key] = value;
+    this._fireConfigChanged();
+  }
+
+  _removeEntity(index) {
+    if (!Array.isArray(this._config.entities)) return;
+    this._config.entities.splice(index, 1);
+    this._updateEntityList();
+    this._populatePersonSelector();
+    this._fireConfigChanged();
+  }
+
+  _fireConfigChanged() {
+    const cfg = { type: 'custom:gramps-anniversaries-dashboard-card', ...this._config };
+    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: cfg } }));
   }
 }
 
