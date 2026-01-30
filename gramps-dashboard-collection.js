@@ -4,24 +4,7 @@ import './gramps-dashboard.js';
 import './gramps-anniversaries-dashboard.js';
 import './gramps-todestage-dashboard.js';
 
-// Optionale window.customCards-Registrierung für die Collection
-window.customCards = window.customCards || [];
-window.customCards.push({
-  type: 'gramps-dashboard-collection',
-  name: 'Gramps Dashboard Collection',
-  description: 'Sammlung: Geburtstage, Jahrestage, Todestage als Custom Cards für Home Assistant',
-  preview: true,
-  documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
-});
-
-// Todestage-Karte explizit registrieren
-window.customCards.push({
-  type: 'gramps-todestage-dashboard-card',
-  name: 'Gramps Todestage Dashboard Card',
-  description: 'Ein anpassbares Todestage-Dashboard-Template für Home Assistant',
-  preview: true,
-  documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
-});
+// Keine eigene Collection-Registrierung und keine doppelte Todestage-Registrierung mehr
 
 
 console.info(
