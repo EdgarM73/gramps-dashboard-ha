@@ -24,7 +24,7 @@ class GrampsAnniversariesDashboardEditor extends HTMLElement {
       show_header: config?.show_header !== false,
       theme: config?.theme || 'default',
       name_entity: config?.name_entity || '',
-      age_entity: config?.age_entity || '',
+      years_ago_entity: config?.years_ago_entity || '',
       anniversary_entity: config?.anniversary_entity || '',
       picture_entity_1: config?.picture_entity_1 || '',
       picture_entity_2: config?.picture_entity_2 || '',
@@ -139,7 +139,7 @@ class GrampsAnniversariesDashboardEditor extends HTMLElement {
     this._config.entities = this._config.entities || [];
     this._config.entities.push({
       name_entity: `sensor.next_anniversary_${number}_name`,
-      age_entity: `sensor.next_anniversary_${number}_age`,
+      years_ago_entity: `sensor.next_anniversary_${number}_years_ago`,
       anniversary_entity: `sensor.next_anniversary_${number}_date`,
       picture_entity_1: `sensor.next_anniversary_${number}_image_person_1`,
       picture_entity_2: `sensor.next_anniversary_${number}_image_person_2`
@@ -167,7 +167,7 @@ class GrampsAnniversariesDashboardEditor extends HTMLElement {
         if (!alreadyAdded) {
           this._config.entities.push({
             name_entity: `sensor.next_anniversary_${number}_name`,
-            age_entity: `sensor.next_anniversary_${number}_age`,
+            years_ago_entity: `sensor.next_anniversary_${number}_years_ago`,
             anniversary_entity: `sensor.next_anniversary_${number}_date`,
             picture_entity_1: `sensor.next_anniversary_${number}_image_person_1`,
             picture_entity_2: `sensor.next_anniversary_${number}_image_person_2`
@@ -530,7 +530,7 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
     const imageEntity1 = config.picture_entity_1 || config.image_entity_1 || this.config.picture_entity_1 || this.config.image_entity_1;
     const imageEntity2 = config.picture_entity_2 || config.image_entity_2 || this.config.picture_entity_2 || this.config.image_entity_2;
     const nameEntity = config.name_entity || this.config.name_entity;
-    const ageEntity = config.age_entity || this.config.age_entity;
+    const ageEntity = config.years_ago_entity || this.config.years_ago_entity;
     const anniversaryEntity = config.anniversary_entity || this.config.anniversary_entity;
 
     if (!nameEntity) {
@@ -555,7 +555,7 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
     const name = nameEntity_obj.state || nameEntity_obj.attributes?.friendly_name || this.localize('unknown');
     const imageUrl1 = imageEntity1_obj?.attributes?.entity_picture || null;
     const imageUrl2 = imageEntity2_obj?.attributes?.entity_picture || null;
-    const age = ageEntity_obj?.state || '-';
+    const years_ago = ageEntity_obj?.state || '-';
     const anniversary = anniversaryEntity_obj?.state 
       ? this.formatDateGerman(anniversaryEntity_obj.state) 
       : '-';
@@ -624,7 +624,7 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
       entities: [
         {
           name_entity: 'sensor.next_anniversary_1_name',
-          age_entity: 'sensor.next_anniversary_1_age',
+          years_ago_entity: 'sensor.next_anniversary_1_years_ago',
           anniversary_entity: 'sensor.next_anniversary_1_date',
           picture_entity_1: 'sensor.next_anniversary_1_image_person_1',
           picture_entity_2: 'sensor.next_anniversary_1_image_person_2'
