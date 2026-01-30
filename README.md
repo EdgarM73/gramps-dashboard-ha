@@ -1,6 +1,14 @@
+
 # Gramps Dashboard
 
-Ein anpassbares Dashboard-Template für Home Assistant.
+Anpassbare Karten für Geburtstage, Todestage und Jubiläen (Anniversaries) in Home Assistant.
+
+## Kartenübersicht
+
+- **Geburtstage:** Zeigt nächste Geburtstage mit Alter (age_entity)
+- **Todestage:** Zeigt nächste Todestage mit Jahren seit Tod (years_ago_entity)
+- **Jubiläen (Anniversaries):** Zeigt Jahre seit Hochzeit (years_together_entity), Karten werden untereinander angezeigt
+
 
 ## Installation
 
@@ -18,64 +26,43 @@ Ein anpassbares Dashboard-Template für Home Assistant.
 
 ### Manuelle Installation
 
-1. Lade `gramps-dashboard.js` herunter
-2. Kopiere die Datei nach `<config>/www/gramps-dashboard.js`
-3. Füge die Ressource in Home Assistant hinzu:
-   - Gehe zu Einstellungen → Dashboards → Rechts oben auf Menü → Ressourcen
-   - Klicke auf "+ Ressource hinzufügen"
-   - URL: `/local/gramps-dashboard.js`
-   - Ressourcentyp: **JavaScript-Modul**
+1. Lade die gewünschten JS-Dateien (`gramps-dashboard.js`, `gramps-todestage-dashboard.js`, `gramps-anniversaries-dashboard.js`) herunter
+2. Kopiere die Dateien nach `<config>/www/`
+3. Füge die Ressourcen in Home Assistant hinzu:
+  - Gehe zu Einstellungen → Dashboards → Rechts oben auf Menü → Ressourcen
+  - Klicke auf "+ Ressource hinzufügen"
+  - URL: `/local/gramps-dashboard.js` (bzw. ...-todestage... oder ...-anniversaries...)
+  - Ressourcentyp: **JavaScript-Modul**
 4. **Wichtig**: Führe einen Hard-Refresh im Browser durch (Strg+F5 / Cmd+Shift+R)
+
 
 ## Verwendung
 
-Nachdem die Installation abgeschlossen ist, kannst du das Template in deinen Dashboard-Karten verwenden.
+Nach der Installation erscheinen im Karten-Picker drei Karten:
+- **Gramps Dashboard (Geburtstage)**
+- **Gramps Todestage Dashboard**
+- **Gramps Anniversaries Dashboard**
 
-**Wichtig bei Updates**: Nach jedem Update der Karte (z.B. über HACS), führe einen **Hard-Refresh** im Browser durch:
-- **Windows/Linux**: Strg + F5 oder Strg + Shift + R
-- **macOS**: Cmd + Shift + R
-
-Dies stellt sicher, dass der Browser die neueste Version der JavaScript-Datei lädt.
+**Wichtig bei Updates:** Nach jedem Update der Karten (z.B. über HACS), führe einen **Hard-Refresh** im Browser durch:
+- **Windows/Linux:** Strg + F5 oder Strg + Shift + R
+- **macOS:** Cmd + Shift + R
 
 ### Mit dem visuellen Editor
 
 1. Öffne dein Dashboard im Bearbeitungsmodus
 2. Klicke auf "+ Karte hinzufügen"
-3. Suche nach "Gramps Dashboard"
-4. Konfiguriere die Karte über den visuellen Editor:
-   - **Allgemein**: Titel, Theme, Header anzeigen
-   - **Globale Entitäten**: Standard-Entitäten für Bild, Name, Alter, Geburtsdatum
-   - **Personen**: Füge Personen hinzu und überschreibe optional die globalen Entitäten
+3. Suche nach "Gramps Dashboard", "Todestage" oder "Anniversaries"
+4. Konfiguriere die jeweilige Karte über den Editor:
+   - **Geburtstage:** wie bisher (age_entity)
+   - **Todestage:** years_ago_entity statt age_entity
+   - **Anniversaries:** years_together_entity statt age_entity, Karten werden untereinander angezeigt
 
 ### Mit YAML
 
+**Geburtstage:**
 ```yaml
 type: custom:gramps-dashboard-card
-title: Mein Dashboard
-entities:
-  - entity: sensor.temperature
-  - entity: light.living_room
-```
-
-## Konfigurationsoptionen
-
-| Option | Typ | Standard | Beschreibung |
-|--------|-----|----------|--------------|
-| `type` | string | **Erforderlich** | `custom:gramps-dashboard-card` |
-| `title` | string | Optional | Titel der Karte |
-| `entities` | list | **Erforderlich** | Liste der anzuzeigenden Personen |
-| `theme` | string | `default` | Theme-Name (`default`, `dark`) |
-| `show_header` | boolean | `true` | Header anzeigen |
-| `image_entity` | string | Optional | Entity für Profilbild (global) |
-| `name_entity` | string | Optional | Entity für Name (global) - **Erforderlich pro Person** |
-| `age_entity` | string | Optional | Entity für Alter (global) |
-| `birthdate_entity` | string | Optional | Entity für Geburtsdatum (global) |
-
-## Entity-Konfiguration
-
-Jede Person benötigt mindestens eine `name_entity`. Optionale Felder können individuell oder global gesetzt werden:
-
-```yaml
+title: Geburtstage
 entities:
   - name_entity: sensor.next_birthday_1_name
     age_entity: sensor.next_birthday_1_age
@@ -83,16 +70,83 @@ entities:
     image_entity: sensor.next_birthday_1_picture
 ```
 
-Die `entity` Eigenschaft ist optional und wird nur für den Click-Handler verwendet (öffnet More-Info Dialog).
+**Todestage:**
+```yaml
+type: custom:gramps-todestage-dashboard-card
+title: Todestage
+entities:
+  - name_entity: sensor.next_deathday_1_name
+    years_ago_entity: sensor.next_deathday_1_years_ago
+    deathdate_entity: sensor.next_deathday_1_date
+    image_entity: sensor.next_deathday_1_picture
+```
+
+**Anniversaries:**
+```yaml
+type: custom:gramps-anniversaries-dashboard-card
+title: Jubiläen
+entities:
+  - name_entity: sensor.next_anniversary_1_name
+    years_together_entity: sensor.next_anniversary_1_years_together
+    anniversary_date_entity: sensor.next_anniversary_1_date
+    image_entity: sensor.next_anniversary_1_picture
+```
+
+
+## Konfigurationsoptionen
+
+| Option | Typ | Standard | Beschreibung |
+|--------|-----|----------|--------------|
+| `type` | string | **Erforderlich** | `custom:gramps-dashboard-card` (Geburtstage), `custom:gramps-todestage-dashboard-card`, `custom:gramps-anniversaries-dashboard-card` |
+| `title` | string | Optional | Titel der Karte |
+| `entities` | list | **Erforderlich** | Liste der anzuzeigenden Personen |
+| `theme` | string | `default` | Theme-Name (`default`, `dark`) |
+| `show_header` | boolean | `true` | Header anzeigen |
+| `image_entity` | string | Optional | Entity für Profilbild (global) |
+| `name_entity` | string | Optional | Entity für Name (global) - **Erforderlich pro Person** |
+| `age_entity` | string | Optional | Entity für Alter (nur Geburtstage) |
+| `years_ago_entity` | string | Optional | Entity für Jahre seit Tod (nur Todestage) |
+| `years_together_entity` | string | Optional | Entity für Jahre seit Hochzeit (nur Anniversaries) |
+| `birthdate_entity` | string | Optional | Entity für Geburtsdatum (Geburtstage) |
+| `deathdate_entity` | string | Optional | Entity für Todestag (Todestage) |
+| `anniversary_date_entity` | string | Optional | Entity für Hochzeitsdatum (Anniversaries) |
+
+
+## Entity-Konfiguration
+
+Jede Person benötigt mindestens eine `name_entity`. Optionale Felder können individuell oder global gesetzt werden. Für Todestage und Anniversaries die jeweiligen neuen Felder nutzen:
+
+```yaml
+# Geburtstage
+entities:
+  - name_entity: sensor.next_birthday_1_name
+    age_entity: sensor.next_birthday_1_age
+    birthdate_entity: sensor.next_birthday_1_date
+    image_entity: sensor.next_birthday_1_picture
+
+# Todestage
+  - name_entity: sensor.next_deathday_1_name
+    years_ago_entity: sensor.next_deathday_1_years_ago
+    deathdate_entity: sensor.next_deathday_1_date
+    image_entity: sensor.next_deathday_1_picture
+
+# Anniversaries
+  - name_entity: sensor.next_anniversary_1_name
+    years_together_entity: sensor.next_anniversary_1_years_together
+    anniversary_date_entity: sensor.next_anniversary_1_date
+    image_entity: sensor.next_anniversary_1_picture
+```
+
+Die `entity`-Eigenschaft ist optional und wird nur für den Click-Handler verwendet (öffnet More-Info Dialog).
+
 
 ## Beispiele
 
 ### Gramps Integration (empfohlen)
 
-Wenn du Gramps-Sensoren verwendest (z.B. `next_birthday_*`):
+Im visuellen Editor filtern die Picker automatisch auf die passenden Sensoren (`sensor.next_birthday_*`, `sensor.next_deathday_*`, `sensor.next_anniversary_*`).
 
-Im visuellen Editor filtern die Picker automatisch auf `sensor.next_birthday_*`, damit du die richtigen Sensoren schneller findest.
-
+**Geburtstage:**
 ```yaml
 type: custom:gramps-dashboard-card
 title: Nächste Geburtstage
@@ -100,52 +154,38 @@ entities:
   - name_entity: sensor.next_birthday_1_name
     age_entity: sensor.next_birthday_1_age
     birthdate_entity: sensor.next_birthday_1_date
-    picture_entity: sensor.next_birthday_1_image
-  - name_entity: sensor.next_birthday_2_name
-    age_entity: sensor.next_birthday_2_age
-    birthdate_entity: sensor.next_birthday_2_date
-    picture_entity: sensor.next_birthday_2_image
-  - name_entity: sensor.next_birthday_3_name
-    age_entity: sensor.next_birthday_3_age
-    birthdate_entity: sensor.next_birthday_3_date
-    picture_entity: sensor.next_birthday_3_image
+    image_entity: sensor.next_birthday_1_image
 ```
 
-### Mit Home Assistant Personen
-
+**Todestage:**
 ```yaml
-type: custom:gramps-dashboard-card
-title: Familie
+type: custom:gramps-todestage-dashboard-card
+title: Nächste Todestage
 entities:
-  - entity: person.max
-    name_entity: input_text.max_name
-    age_entity: sensor.max_age
-    birthdate_entity: sensor.max_birthdate
+  - name_entity: sensor.next_deathday_1_name
+    years_ago_entity: sensor.next_deathday_1_years_ago
+    deathdate_entity: sensor.next_deathday_1_date
+    image_entity: sensor.next_deathday_1_image
 ```
 
-### Mit globalen Einstellungen
-
-Wenn alle Sensoren dem gleichen Muster folgen, kannst du globale Werte setzen:
-
+**Anniversaries:**
 ```yaml
-type: custom:gramps-dashboard-card
-title: Meine Familie
-theme: dark
-show_header: true
+type: custom:gramps-anniversaries-dashboard-card
+title: Nächste Jubiläen
 entities:
-  - name_entity: sensor.person_1_name
-    age_entity: sensor.person_1_age
+  - name_entity: sensor.next_anniversary_1_name
+    years_together_entity: sensor.next_anniversary_1_years_together
+    anniversary_date_entity: sensor.next_anniversary_1_date
+    image_entity: sensor.next_anniversary_1_image
 ```
 
 ### Layout-Ergebnis
 
-Jede Person wird als Button angezeigt:
-- **3 Zeilen hoch** und **6 Spalten breit** (auf Desktops)
-- **Oben links**: Profilbild der Person
-- **Oben rechts**: Name der Person
-- **Unten**: Alter und Geburtsdatum in separaten Details
- 
-Hinweis: Das Geburtsdatum wird im Format `dd.mm.yyyy` angezeigt.
+- Geburtstage und Todestage: Karten im Grid-Layout
+- Anniversaries: Karten werden **untereinander** (vertikal) angezeigt
+
+Hinweis: Die jeweiligen Datumsfelder werden im Format `dd.mm.yyyy` angezeigt.
+
 
 ## Support
 
