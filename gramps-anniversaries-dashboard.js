@@ -409,7 +409,7 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
         }
         .card-content {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: 1fr;
           gap: 20px;
         }
         .person-button {
@@ -479,24 +479,6 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
         }
         .theme-dark .person-image {
           background: rgba(255, 255, 255, 0.05);
-        }
-        @media (max-width: 1200px) {
-          .card-content {
-            grid-template-columns: repeat(3, 1fr);
-          }
-          .person-button {
-            grid-column: span 3;
-          }
-        }
-        @media (max-width: 768px) {
-          .card-content {
-            grid-template-columns: 1fr;
-          }
-          .person-button {
-            grid-column: span 1;
-            grid-row: span 1;
-            grid-template-columns: 1fr 1fr 2fr;
-          }
         }
       </style>
       ${this.config.show_header ? `<div class="card-header">${this.config.title || this.localize('anniversaries')}</div>` : ''}
