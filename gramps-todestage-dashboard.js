@@ -117,34 +117,37 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       .actions { display: flex; gap: 8px; }
       button { padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; }
     `;
-    // ...existing code...
+      // ...existing code for rendering the editor UI...
+      // (Insert the actual template logic here, similar to other dashboard editors)
     }
 
-    const addAllBtn = this.shadowRoot.getElementById('add-all-btn');
-    if (addAllBtn) {
-      addAllBtn.addEventListener('click', () => {
-        this._addAllPersons();
+    // Setup event listeners after rendering (call this after render())
+    _setupEventListeners() {
+      const addAllBtn = this.shadowRoot.getElementById('add-all-btn');
+      if (addAllBtn) {
+        addAllBtn.addEventListener('click', () => {
+          this._addAllPersons();
+        });
+      }
+
+      const removeButtons = this.shadowRoot.querySelectorAll('.remove');
+      removeButtons.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.dataset.index, 10);
+          this._removeEntity(idx);
+        });
+      });
+
+      // Listen for image entity input changes
+      const imageInputs = this.shadowRoot.querySelectorAll('input[data-key]');
+      imageInputs.forEach((input) => {
+        input.addEventListener('input', (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          const key = e.target.dataset.key;
+          this._updateEntity(idx, key, e.target.value);
+        });
       });
     }
-
-    const removeButtons = this.shadowRoot.querySelectorAll('.remove');
-    removeButtons.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const idx = parseInt(e.target.dataset.index, 10);
-        this._removeEntity(idx);
-      });
-    });
-
-    // Listen for image entity input changes
-    const imageInputs = this.shadowRoot.querySelectorAll('input[data-key]');
-    imageInputs.forEach((input) => {
-      input.addEventListener('input', (e) => {
-        const idx = parseInt(e.target.dataset.idx, 10);
-        const key = e.target.dataset.key;
-        this._updateEntity(idx, key, e.target.value);
-      });
-    });
-  }
 
   _populatePersonSelector() {
     if (!this._hass) return;
@@ -325,6 +328,8 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this._hass = null;
     this.config = {};
+  }
+
   render() {
     const card = document.createElement('div');
     card.className = 'todestage-card';
