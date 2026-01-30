@@ -89,6 +89,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       entities: Array.isArray(config?.entities) ? JSON.parse(JSON.stringify(config.entities)) : [],
     };
     this.render();
+    this._setupEventListeners();
     this._updatePickers();
   }
 
