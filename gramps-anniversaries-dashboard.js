@@ -408,10 +408,11 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
           margin-bottom: 16px;
         }
         .card-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 20px;
+          display: block;
+        }
+        .person-button {
+          width: 100%;
+          margin-bottom: 20px;
         }
         .person-button {
           display: grid;
