@@ -378,3 +378,18 @@ class GrampsTodestageDashboardCard extends HTMLElement {
 }
 
 customElements.define('gramps-todestage-dashboard-card', GrampsTodestageDashboardCard);
+// window.customCards Registrierung für Home Assistant Dashboard-Auswahl
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'gramps-todestage-dashboard-card',
+  name: 'Gramps Todestage Dashboard Card',
+  description: 'Ein anpassbares Todestage-Dashboard-Template für Home Assistant',
+  preview: true,
+  documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
+});
+
+console.info(
+  '%c GRAMPS-TODESTAGE-DASHBOARD-CARD %c v1.0.0 ',
+  'color: white; background: #03a9f4; font-weight: 700;',
+  'color: #03a9f4; background: white; font-weight: 700;',
+);
