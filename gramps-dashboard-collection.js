@@ -14,6 +14,15 @@ window.customCards.push({
   documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
 });
 
+// Todestage-Karte explizit registrieren
+window.customCards.push({
+  type: 'gramps-todestage-dashboard-card',
+  name: 'Gramps Todestage Dashboard Card',
+  description: 'Ein anpassbares Todestage-Dashboard-Template für Home Assistant',
+  preview: true,
+  documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
+});
+
 
 console.info(
   '%c GRAMPS-DASHBOARD-COLLECTION %c v1.0.0 ',
