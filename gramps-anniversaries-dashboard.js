@@ -555,7 +555,7 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
     const name = nameEntity_obj.state || nameEntity_obj.attributes?.friendly_name || this.localize('unknown');
     const imageUrl1 = imageEntity1_obj?.attributes?.entity_picture || null;
     const imageUrl2 = imageEntity2_obj?.attributes?.entity_picture || null;
-    const years_ago = ageEntity_obj?.state || '-';
+    const age = ageEntity_obj?.state || '-';
     const anniversary = anniversaryEntity_obj?.state 
       ? this.formatDateGerman(anniversaryEntity_obj.state) 
       : '-';
