@@ -14,8 +14,19 @@ window.customCards.push({
   documentationURL: 'https://github.com/EdgarM73/gramps-dashboard-ha',
 });
 
+
 console.info(
   '%c GRAMPS-DASHBOARD-COLLECTION %c v1.0.0 ',
   'color: white; background: #03a9f4; font-weight: 700;',
   'color: #03a9f4; background: white; font-weight: 700;',
 );
+
+// Minimal custom element definition for the collection
+class GrampsDashboardCollection extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.innerHTML = `<div>Gramps Dashboard Collection loaded.</div>`;
+  }
+}
+customElements.define('gramps-dashboard-collection', GrampsDashboardCollection);
