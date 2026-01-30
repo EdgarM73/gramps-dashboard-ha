@@ -118,9 +118,51 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       .actions { display: flex; gap: 8px; }
       button { padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; }
     `;
-      // ...existing code for rendering the editor UI...
-      // (Insert the actual template logic here, similar to other dashboard editors)
-    }
+    const editor = document.createElement('div');
+    editor.className = 'editor';
+    editor.innerHTML = `
+      <style>${styles}</style>
+      <fieldset class="full">
+        <legend>${this.localize('general')}</legend>
+        <div class="row">
+          <label>
+            ${this.localize('title')}
+            <input id="title" type="text" value="${this._config.title || ''}" placeholder="${this.localize('anniversaries')}" />
+          </label>
+          <label>
+            ${this.localize('theme')}
+            <select id="theme" value="${this._config.theme}">
+              <option value="default" ${this._config.theme === 'default' ? 'selected' : ''}>${this.localize('default')}</option>
+              <option value="dark" ${this._config.theme === 'dark' ? 'selected' : ''}>${this.localize('dark')}</option>
+            </select>
+          </label>
+        </div>
+        <label class="full" style="margin-top:8px;">
+          <input id="show_header" type="checkbox" ${this._config.show_header ? 'checked' : ''} /> ${this.localize('show_header')}
+        </label>
+      </fieldset>
+
+      <fieldset class="full">
+        <legend>${this.localize('persons')}</legend>
+        <div class="entities" id="entities">
+          <!-- Entities will be rendered here -->
+        </div>
+        <div class="actions" style="margin-top:8px; display: flex; gap: 8px;">
+          <label style="flex: 1;">
+            ${this.localize('add_person')}
+            <select id="person-selector" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2);">
+              <option value="">${this.localize('select_person')}</option>
+            </select>
+          </label>
+          <button id="add-all-btn" style="padding: 8px 16px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; background: var(--primary-color, #03A9F4); color: white; font-weight: 600; height: 42px; margin-top: 24px;">${this.localize('add_all')}</button>
+        </div>
+      </fieldset>
+    `;
+    this.shadowRoot.innerHTML = '';
+    this.shadowRoot.appendChild(editor);
+    this._populatePersonSelector();
+    // Entities will be rendered by _updateEntityList()
+  }
 
     // Setup event listeners after rendering (call this after render())
     _setupEventListeners() {
