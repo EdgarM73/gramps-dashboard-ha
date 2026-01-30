@@ -26,7 +26,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
       image_entity: config?.image_entity || config?.picture_entity || '',
       picture_entity: config?.picture_entity || config?.image_entity || '',
       name_entity: config?.name_entity || '',
-      age_entity: config?.age_entity || '',
+      years_ago_entity: config?.years_ago_entity || '',
       deathdate_entity: config?.deathdate_entity || '',
       entities: Array.isArray(config?.entities) ? JSON.parse(JSON.stringify(config.entities)) : [],
     };
@@ -404,7 +404,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
       show_header: config.show_header !== false,
       image_entity: config.image_entity || null,
       name_entity: config.name_entity || null,
-      age_entity: config.age_entity || null,
+      years_ago_entity: config.years_ago_entity || null,
       deathdate_entity: config.deathdate_entity || null,
       ...config
     };
@@ -597,7 +597,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     // Todestags-Entitäten
     const imageEntity = config.picture_entity || config.image_entity || this.config.picture_entity || this.config.image_entity;
     const nameEntity = config.name_entity || this.config.name_entity;
-    const ageEntity = config.age_entity || this.config.age_entity;
+    const yearsAgoEntity = config.years_ago_entity || this.config.years_ago_entity;
     const deathdateEntity = config.deathdate_entity || this.config.deathdate_entity;
     if (!nameEntity) {
       console.warn(`Gramps Todestage: name_entity fehlt in der Konfiguration`);
@@ -605,7 +605,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     }
     const imageEntity_obj = imageEntity ? this._hass.states[imageEntity] : null;
     const nameEntity_obj = this._hass.states[nameEntity];
-    const ageEntity_obj = ageEntity ? this._hass.states[ageEntity] : null;
+    const yearsAgoEntity_obj = yearsAgoEntity ? this._hass.states[yearsAgoEntity] : null;
     const deathdateEntity_obj = deathdateEntity ? this._hass.states[deathdateEntity] : null;
     if (!nameEntity_obj) {
       console.warn(`Gramps Todestage: Namens-Entitaet ${nameEntity} nicht gefunden`);
@@ -615,7 +615,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     button.className = 'person-button';
     const name = nameEntity_obj.state || nameEntity_obj.attributes?.friendly_name || this.localize('unknown');
     const imageUrl = imageEntity_obj?.attributes?.entity_picture || null;
-    const age = ageEntity_obj?.state || '-';
+    const yearsAgo = yearsAgoEntity_obj?.state || '-';
     const deathdate = deathdateEntity_obj?.state 
       ? this.formatDateGerman(deathdateEntity_obj.state) 
       : '-';
@@ -630,7 +630,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
       <div class="person-details">
         <div class="detail-item">
           <div class="detail-label">${this.localize('years')}</div>
-          <div class="detail-value">${age}</div>
+          <div class="detail-value">${yearsAgo}</div>
         </div>
         <div class="detail-item">
           <div class="detail-label">${this.localize('deathday')}</div>
@@ -681,7 +681,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
       entities: [
         {
           name_entity: 'sensor.next_deathday_1_name',
-          age_entity: 'sensor.next_deathday_1_age',
+          years_ago_entity: 'sensor.next_deathday_1_years_ago',
           deathdate_entity: 'sensor.next_deathday_1_date',
           picture_entity: 'sensor.next_deathday_1_image'
         }
