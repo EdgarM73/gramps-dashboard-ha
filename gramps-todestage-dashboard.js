@@ -1,5 +1,4 @@
 const TRANSLATIONS = {
-  const TRANSLATIONS = {
     de: {
       anniversaries: 'Todestage',
       years: 'Jahre',
