@@ -1,4 +1,7 @@
 
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=EdgarM73&repository=https%3A%2F%2Fgithub.com%2FEdgarM73%2FgrampswebHA&category=Integration)
+
 # Gramps Dashboard
 
 Anpassbare Karten für Geburtstage, Todestage und Jubiläen (Anniversaries) in Home Assistant.
@@ -13,6 +16,8 @@ Anpassbare Karten für Geburtstage, Todestage und Jubiläen (Anniversaries) in H
 ## Installation
 
 ### HACS (empfohlen)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=EdgarM73&repository=https%3A%2F%2Fgithub.com%2FEdgarM73%2Fgramps-dashboard-ha&category=Dashboard)
 
 1. Öffne HACS im Home Assistant
 2. Gehe zu "Frontend"
