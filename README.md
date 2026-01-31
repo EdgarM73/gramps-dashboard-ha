@@ -179,6 +179,14 @@ entities:
     image_entity: sensor.next_anniversary_1_image
 ```
 
+
+### Beispielbilder
+
+So sieht das Gramps Dashboard in Home Assistant aus:
+
+![Gramps Dashboard Beispiel 1](./gramps1.png)
+![Gramps Dashboard Beispiel 2](./gramps2.png)
+
 ### Layout-Ergebnis
 
 - Geburtstage und Todestage: Karten im Grid-Layout
