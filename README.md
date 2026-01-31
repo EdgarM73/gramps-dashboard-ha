@@ -68,11 +68,12 @@ Nach der Installation erscheinen im Karten-Picker drei Karten:
 ```yaml
 type: custom:gramps-dashboard-card
 title: Geburtstage
+theme: default
 entities:
   - name_entity: sensor.next_birthday_1_name
     age_entity: sensor.next_birthday_1_age
-    birthdate_entity: sensor.next_birthday_1_date
-    image_entity: sensor.next_birthday_1_picture
+    birthdate_entity: sensor.next_birthday_1_upcoming_date
+    image_entity: sensor.next_birthday_1_image
 ```
 
 **Todestage:**
