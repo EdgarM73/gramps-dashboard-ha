@@ -2,7 +2,7 @@ const TRANSLATIONS = {
   de: {
     birthdays: 'Geburtstage',
     years: 'Jahre',
-    birthday: 'Geburtstag',
+    birthday: 'Nächster Geburtstag',
     no_entities: 'Keine Personen konfiguriert',
     title: 'Titel',
     theme: 'Theme',
