@@ -1886,7 +1886,7 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
   }
 
   render() {
-    const card = document.createElement('div');
+    const card = document.createElement('ha-card');
     card.className = 'anniversaries-card';
     card.innerHTML = `
       <style>
@@ -1899,10 +1899,13 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
         }
         .card-content {
           display: block;
+          padding: 0 16px 16px 16px;
+          box-sizing: border-box;
         }
         .person-button {
           width: 100%;
           margin-bottom: 20px;
+          box-sizing: border-box;
         }
         .person-button {
           display: flex;
