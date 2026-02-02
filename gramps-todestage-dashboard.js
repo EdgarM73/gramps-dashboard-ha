@@ -206,7 +206,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
     this._config.entities.push({
       name_entity: `sensor.next_deathday_${number}_name`,
       years_ago_entity: `sensor.next_deathday_${number}_years_ago`,
-      deathdate_entity: `sensor.next_deathday_${number}_date`,
+      deathdate_entity: `sensor.next_deathday_${number}_upcoming_date`,
       picture_entity: `sensor.next_deathday_${number}_image`
     });
     this._updateEntityList();
@@ -235,7 +235,7 @@ class GrampsTodestageDashboardEditor extends HTMLElement {
           this._config.entities.push({
             name_entity: `sensor.next_deathday_${number}_name`,
             years_ago_entity: `sensor.next_deathday_${number}_years_ago`,
-            deathdate_entity: `sensor.next_deathday_${number}_date`,
+            deathdate_entity: `sensor.next_deathday_${number}_upcoming_date`,
             picture_entity: `sensor.next_deathday_${number}_image`
           });
           addedCount++;
@@ -682,7 +682,7 @@ class GrampsTodestageDashboardCard extends HTMLElement {
         {
           name_entity: 'sensor.next_deathday_1_name',
           years_ago_entity: 'sensor.next_deathday_1_years_ago',
-          deathdate_entity: 'sensor.next_deathday_1_date',
+          deathdate_entity: 'sensor.next_deathday_1_upcoming_date',
           picture_entity: 'sensor.next_deathday_1_image'
         }
       ],

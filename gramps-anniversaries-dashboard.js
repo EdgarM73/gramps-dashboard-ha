@@ -415,9 +415,9 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
           margin-bottom: 20px;
         }
         .person-button {
-          display: grid;
-          grid-template-columns: 1fr 1fr 2fr;
-          align-items: center;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
           background: var(--card-background-color, #fff);
           border: 1px solid var(--divider-color, #e0e0e0);
           border-radius: 12px;
@@ -429,6 +429,11 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
         .person-button:hover {
           box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
+        .person-images {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
         .person-image {
           width: 64px;
           height: 64px;
@@ -438,7 +443,6 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          margin-right: 8px;
         }
         .person-image img {
           width: 100%;
@@ -448,12 +452,11 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
         .person-details {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 8px;
         }
         .person-name {
           font-size: 18px;
           font-weight: 600;
-          margin-bottom: 4px;
         }
         .detail-item {
           display: flex;
@@ -564,14 +567,16 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
       : '-';
 
     button.innerHTML = `
-      <div class="person-image">
-        ${imageUrl1 ? `<img src="${imageUrl1}" alt="${name} Bild 1" />` : `<ha-icon icon="mdi:account"></ha-icon>`}
-      </div>
-      <div class="person-image">
-        ${imageUrl2 ? `<img src="${imageUrl2}" alt="${name} Bild 2" />` : `<ha-icon icon="mdi:account"></ha-icon>`}
-      </div>
       <div class="person-details">
         <div class="person-name">${name}</div>
+        <div class="person-images">
+          <div class="person-image">
+            ${imageUrl1 ? `<img src="${imageUrl1}" alt="${name} Bild 1" />` : `<ha-icon icon="mdi:account"></ha-icon>`}
+          </div>
+          <div class="person-image">
+            ${imageUrl2 ? `<img src="${imageUrl2}" alt="${name} Bild 2" />` : `<ha-icon icon="mdi:account"></ha-icon>`}
+          </div>
+        </div>
         <div class="detail-item">
           <div class="detail-label">${this.localize('years')}</div>
           <div class="detail-value">${yearsTogether}</div>

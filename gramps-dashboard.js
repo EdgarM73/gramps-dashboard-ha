@@ -628,7 +628,7 @@ class GrampsDashboardEditor extends HTMLElement {
     this._config.entities.push({
       name_entity: `sensor.next_birthday_${number}_name`,
       age_entity: `sensor.next_birthday_${number}_age`,
-      birthdate_entity: `sensor.next_birthday_${number}_date`,
+      birthdate_entity: `sensor.next_birthday_${number}_upcoming_date`,
       picture_entity: `sensor.next_birthday_${number}_image`
     });
     this._updateEntityList();
@@ -661,7 +661,7 @@ class GrampsDashboardEditor extends HTMLElement {
           this._config.entities.push({
             name_entity: `sensor.next_birthday_${number}_name`,
             age_entity: `sensor.next_birthday_${number}_age`,
-            birthdate_entity: `sensor.next_birthday_${number}_date`,
+            birthdate_entity: `sensor.next_birthday_${number}_upcoming_date`,
             picture_entity: `sensor.next_birthday_${number}_image`
           });
           addedCount++;
