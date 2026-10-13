@@ -558,6 +558,11 @@ class GrampsAnniversariesDashboardCard extends HTMLElement {
       return null;
     }
 
+    // Leere Slots (z. B. 6. Eintrag bei nur 5 Jahrestagen) nicht anzeigen
+    if (['unknown', 'unavailable', '', 'None'].includes(nameEntity_obj.state)) {
+      return null;
+    }
+
     const button = document.createElement('div');
     button.className = 'person-button';
 
