@@ -327,6 +327,11 @@ class GrampsDashboardCard extends HTMLElement {
       return null;
     }
 
+    // Leere Slots (z. B. mehr konfigurierte Eintraege als vorhandene Daten) nicht anzeigen
+    if (['unknown', 'unavailable', '', 'None'].includes(nameEntity_obj.state)) {
+      return null;
+    }
+
     const button = document.createElement('div');
     button.className = 'person-button';
 
@@ -1379,6 +1384,11 @@ class GrampsTodestageDashboardCard extends HTMLElement {
     const deathdateEntity_obj = deathdateEntity ? this._hass.states[deathdateEntity] : null;
     if (!nameEntity_obj) {
       console.warn(`Gramps Todestage: Namens-Entitaet ${nameEntity} nicht gefunden`);
+      return null;
+    }
+
+    // Leere Slots (z. B. mehr konfigurierte Eintraege als vorhandene Daten) nicht anzeigen
+    if (['unknown', 'unavailable', '', 'None'].includes(nameEntity_obj.state)) {
       return null;
     }
     const button = document.createElement('div');

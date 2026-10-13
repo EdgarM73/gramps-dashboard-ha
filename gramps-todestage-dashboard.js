@@ -611,6 +611,11 @@ class GrampsTodestageDashboardCard extends HTMLElement {
       console.warn(`Gramps Todestage: Namens-Entitaet ${nameEntity} nicht gefunden`);
       return null;
     }
+
+    // Leere Slots (z. B. mehr konfigurierte Eintraege als vorhandene Daten) nicht anzeigen
+    if (['unknown', 'unavailable', '', 'None'].includes(nameEntity_obj.state)) {
+      return null;
+    }
     const button = document.createElement('div');
     button.className = 'person-button';
     const name = nameEntity_obj.state || nameEntity_obj.attributes?.friendly_name || this.localize('unknown');
